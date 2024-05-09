@@ -44,15 +44,22 @@ function getUserProfile() {
         "Authorization": "Bearer " + accessToken
       },
       success: function(response) {
-        var profilePictureUrl = response.images[0].url;
-        $("#profile-picture").attr("src", profilePictureUrl);
+        if (response.images.length > 0) {
+          var profilePictureUrl = response.images[0].url;
+          $("#profile-picture").attr("src", profilePictureUrl);
+        } else {
+          console.log("User does not have a profile picture.");
+        }
       },
       error: function(xhr, status, error) {
-        console.log(error);
+        console.log("Error fetching user profile:", error);
       }
     });
+  } else {
+    console.log("Access token not found.");
   }
 }
+
 
 function getAccessTokenFromLocalStorage() {
   return localStorage.getItem("access_token");
