@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoodSwinger</title>
+    <style>
+        /* Style for the disabled dropdown */
+        #dropdown {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Spotify Login</h2>
+    <p>Select a playlist:</p>
+    <select id="dropdown" disabled>
+        <option value="playlist1">Playlist 1</option>
+        <option value="playlist2">Playlist 2</option>
+        <option value="playlist3">Playlist 3</option>
+        <option value="playlist4">Playlist 4</option>
+        <option value="playlist5">Playlist 5</option>
+    </select>
+    <br><br>
+    <a href="https://accounts.spotify.com/authorize?client_id=a80fcf0c3aae4aabb6f6b6721183b72e&response_type=code&redirect_uri=http://localhost:3000/second_page.html&scope=user-read-private%20user-read-email&state=STATE&show_dialog=true" class="spotify-login-btn">Login with Spotify</a>
+
+    <script>
+        // Function to enable the dropdown
+        function enableDropdown() {
+            var dropdown = document.getElementById("dropdown");
+            dropdown.disabled = false;
+        }
+
+        // Check if the URL contains an access token
+        window.addEventListener("load", function() {
+            var accessToken = getAccessTokenFromURL();
+            if (accessToken) {
+                // If access token is present, redirect to the second page
+                window.location.href = "/second_page.html";
+            }
+        });
+
+        // Function to extract access token from URL
+        function getAccessTokenFromURL() {
+            var accessToken = null;
+            var hash = window.location.hash.substring(1);
+            var params = hash.split('&');
+            for (var i = 0; i < params.length; i++) {
+                var param = params[i].split('=');
+                if (param[0] === 'access_token') {
+                    accessToken = param[1];
+                    break;
+                }
+            }
+            return accessToken;
+        }
+    </script>
+</body>
+</html>
