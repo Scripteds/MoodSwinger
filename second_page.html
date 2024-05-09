@@ -10,6 +10,11 @@
 
 <h1>Spotify API Search</h1>
 
+<!-- Display user profile picture -->
+<div id="profile-info">
+  <img id="profile-picture" src="" alt="Profile Picture">
+</div>
+
 <select id="artists">
   <option value="0">Select an artist...</option>
   <option value="4dpARuHxo51G3z768sgnrY">Adele</option>
@@ -24,6 +29,28 @@
 <div id="results"></div>
 
 <script>
+$(document).ready(function() {
+  // Fetch user profile data when the page loads
+  getUserProfile();
+});
+
+function getUserProfile() {
+  $.ajax({
+    url: "https://api.spotify.com/v1/me",
+    type: "GET",
+    headers: {
+      "Authorization": "Bearer " + localStorage.getItem("access_token")
+    },
+    success: function(response) {
+      var profilePictureUrl = response.images[0].url;
+      $("#profile-picture").attr("src", profilePictureUrl);
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
+    }
+  });
+}
+  
 function searchSongs() {
   var selectedArtist = $("#artists").val();
   if (selectedArtist == "0") {
