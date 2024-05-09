@@ -97,15 +97,17 @@ function displayResults(data) {
     var trackName = tracks[i].name;
     var trackId = tracks[i].id;
     var previewUrl = tracks[i].preview_url;
+    var spotifyUrl = "https://open.spotify.com/track/" + trackId;
     if (previewUrl) {
-      html += '<li>' + trackName + ': <iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></li>';
+      html += '<li><a href="' + spotifyUrl + '" target="_blank">' + trackName + '</a>: <iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></li>';
     } else {
-      html += '<li>' + trackName + ' (Preview not available)</li>';
+      html += '<li><a href="' + spotifyUrl + '" target="_blank">' + trackName + ' (Preview not available)</a></li>';
     }
   }
   html += "</ul>";
   $("#results").html(html);
 }
+
 </script>
 
 </body>
