@@ -50,8 +50,25 @@
   }
 
   /* Results container style */
-  #results {
+  #results-container {
     margin-top: 20px;
+    text-align: center;
+  }
+
+  /* Individual track style */
+  /* Individual track style */
+.track {
+  padding: 10px;
+  margin: 5px; /* Adjusted margin */
+  border: 1px solid #ccc;
+  border-radius: 1px;
+  text-align: center; /* Center content within the track */
+}
+
+
+  .track a {
+    display: block;
+    margin-top: 10px;
   }
 
   /* Logout button style */
@@ -88,7 +105,9 @@
   <button onclick="searchSongs()">Search</button>
 </div>
 
-<div id="results"></div>
+<div id="results-container">
+  <div id="results"></div>
+</div>
 
 <!-- Logout button -->
 <button id="logout-button">Logout</button>
@@ -159,19 +178,24 @@ function searchTopTracks(artistId, accessToken) {
 
 function displayResults(data) {
   var tracks = data.tracks;
-  var html = "<h2>Top 5 Tracks</h2><ul>";
+  var html = "<h2>Top 5 Tracks</h2>";
+  html += "<div class='tracks'>";
   for (var i = 0; i < 5; i++) {
     var trackName = tracks[i].name;
     var trackId = tracks[i].id;
     var previewUrl = tracks[i].preview_url;
     var spotifyUrl = "https://open.spotify.com/track/" + trackId;
+    html += "<div class='track'>";
+    html += "<p><strong>" + trackName + "</strong></p>";
     if (previewUrl) {
-      html += '<li><a href="' + spotifyUrl + '" target="_blank">' + trackName + '</a>: <iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></li>';
+      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
     } else {
-      html += '<li><a href="' + spotifyUrl + '" target="_blank">' + trackName + ' (Preview not available)</a></li>';
+      html += "<p>(Preview not available)</p>";
     }
+    html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
+    html += "</div>";
   }
-  html += "</ul>";
+  html += "</div>";
   $("#results").html(html);
 }
 
