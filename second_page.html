@@ -10,9 +10,9 @@
 
 <h1>Spotify API Search</h1>
 
-<!-- Display user profile picture -->
+<!-- Display logout button -->
 <div id="profile-info">
-  <img id="profile-picture" src="" alt="Profile Picture">
+  <button id="logout-button">Logout</button>
 </div>
 
 <select id="artists">
@@ -30,6 +30,11 @@
 
 <script>
 $(document).ready(function() {
+  // Attach event listener to logout button
+  $("#logout-button").click(function() {
+    logout();
+  });
+
   // Fetch user profile data when the page loads
   getUserProfile();
 });
@@ -44,12 +49,8 @@ function getUserProfile() {
         "Authorization": "Bearer " + accessToken
       },
       success: function(response) {
-        if (response.images.length > 0) {
-          var profilePictureUrl = response.images[0].url;
-          $("#profile-picture").attr("src", profilePictureUrl);
-        } else {
-          console.log("User does not have a profile picture.");
-        }
+        // Display user's display name in the console for demonstration
+        console.log("Logged in as: " + response.display_name);
       },
       error: function(xhr, status, error) {
         console.log("Error fetching user profile:", error);
@@ -60,9 +61,15 @@ function getUserProfile() {
   }
 }
 
-
 function getAccessTokenFromLocalStorage() {
   return localStorage.getItem("access_token");
+}
+
+function logout() {
+  // Clear access token from localStorage
+  localStorage.removeItem("access_token");
+  // Redirect the user to the Spotify logout endpoint
+  window.location.href = "https://www.spotify.com/logout/";
 }
   
 function searchSongs() {
