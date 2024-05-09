@@ -1,37 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoodSwinger</title>
-    <style>
-        /* Style for the enabled dropdown */
-        #dropdown {
-            background-color: #ffffff; /* Change background color to indicate it's clickable */
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spotify API Search</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <h2>Spotify Login</h2>
-    <p>Select a playlist:</p>
-    <select id="dropdown">
-        <option value="playlist1">Playlist 1</option>
-        <option value="playlist2">Playlist 2</option>
-        <option value="playlist3">Playlist 3</option>
-        <option value="playlist4">Playlist 4</option>
-        <option value="playlist5">Playlist 5</option>
-    </select>
-    <br><br>
-    <script>
-        // Function to enable the dropdown
-        function enableDropdown() {
-            var dropdown = document.getElementById("dropdown");
-            dropdown.disabled = false;
-            dropdown.style.backgroundColor = "#f2f2f2"; // Change background color back to disabled style
-        }
 
-        // Call enableDropdown function on window load
-        window.addEventListener("load", enableDropdown);
-    </script>
+<h1>Spotify API Search</h1>
+
+<select id="artists">
+  <option value="0">Select an artist...</option>
+  <option value="4dpARuHxo51G3z768sgnrY">Adele</option>
+  <option value="3TVXtAsR1Inumwj472S9r4">Drake</option>
+  <option value="6qqNVTkY8uBg9cP3Jd7DAH">Billie Eilish</option>
+  <option value="1Xyo4u8uXC1ZmMpatF05PJ">The Weeknd</option>
+  <option value="0du5cEVh5yTK9QJze8zA0C">Bruno Mars</option>
+</select>
+
+<button onclick="searchSongs()">Search</button>
+
+<div id="results"></div>
+
+<script>
+function searchSongs() {
+  var selectedArtist = $("#artists").val();
+  if (selectedArtist == "0") {
+    alert("Please select an artist.");
+    return;
+  }
+
+  // Client ID and Client Secret
+  var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
+  var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
+
+  // Request access token
+  $.ajax({
+    url: "https://accounts.spotify.com/api/token",
+    type: "POST",
+    headers: {
+      "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
+    },
+    data: {
+      "grant_type": "client_credentials"
+    },
+    success: function(response) {
+      var accessToken = response.access_token;
+      searchTopTracks(selectedArtist, accessToken);
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
+    }
+  });
+}
+
+function searchTopTracks(artistId, accessToken) {
+  var apiUrl = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?country=PH";
+
+  // Check if access token is available
+  if (!accessToken) {
+    console.log("Access token not available.");
+    return;
+  }
+
+  $.ajax({
+    url: apiUrl,
+    type: "GET",
+    headers: {
+      "Authorization": "Bearer " + accessToken
+    },
+    success: function(response) {
+      displayResults(response);
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
+    }
+  });
+}
+
+function displayResults(data) {
+  var tracks = data.tracks;
+  var html = "<h2>Top 5 Tracks</h2><ul>";
+  for (var i = 0; i < 5; i++) {
+    var trackName = tracks[i].name;
+    var trackId = tracks[i].id;
+    var previewUrl = tracks[i].preview_url;
+    if (previewUrl) {
+      html += '<li>' + trackName + ': <iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe></li>';
+    } else {
+      html += '<li>' + trackName + ' (Preview not available)</li>';
+    }
+  }
+  html += "</ul>";
+  $("#results").html(html);
+}
+</script>
+
 </body>
 </html>
