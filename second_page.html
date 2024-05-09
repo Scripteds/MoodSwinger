@@ -10,11 +10,6 @@
 
 <h1>Spotify API Search</h1>
 
-<!-- Display logout button -->
-<div id="profile-info">
-  <button id="logout-button">Logout</button>
-</div>
-
 <select id="artists">
   <option value="0">Select an artist...</option>
   <option value="4dpARuHxo51G3z768sgnrY">Adele</option>
@@ -28,50 +23,18 @@
 
 <div id="results"></div>
 
+<!-- Logout button -->
+<button id="logout-button">Logout</button>
+
 <script>
 $(document).ready(function() {
   // Attach event listener to logout button
   $("#logout-button").click(function() {
-    logout();
+    // Redirect to index.html
+    window.location.href = "index.html";
   });
-
-  // Fetch user profile data when the page loads
-  getUserProfile();
 });
 
-function getUserProfile() {
-  var accessToken = getAccessTokenFromLocalStorage();
-  if (accessToken) {
-    $.ajax({
-      url: "https://api.spotify.com/v1/me",
-      type: "GET",
-      headers: {
-        "Authorization": "Bearer " + accessToken
-      },
-      success: function(response) {
-        // Display user's display name in the console for demonstration
-        console.log("Logged in as: " + response.display_name);
-      },
-      error: function(xhr, status, error) {
-        console.log("Error fetching user profile:", error);
-      }
-    });
-  } else {
-    console.log("Access token not found.");
-  }
-}
-
-function getAccessTokenFromLocalStorage() {
-  return localStorage.getItem("access_token");
-}
-
-function logout() {
-  // Clear access token from localStorage
-  localStorage.removeItem("access_token");
-  // Redirect the user to the Spotify logout endpoint
-  window.location.href = "https://www.spotify.com/logout/";
-}
-  
 function searchSongs() {
   var selectedArtist = $("#artists").val();
   if (selectedArtist == "0") {
@@ -95,7 +58,6 @@ function searchSongs() {
     },
     success: function(response) {
       var accessToken = response.access_token;
-      localStorage.setItem("access_token", accessToken); // Store access token in localStorage
       searchTopTracks(selectedArtist, accessToken);
     },
     error: function(xhr, status, error) {
