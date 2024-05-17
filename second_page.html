@@ -6,120 +6,224 @@
 <title>Spotify API Search</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
-  /* Body style */
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f9f9f9;
-  }
+/* Body style */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  /* Heading style */
-  h1 {
-    color: #333;
-    text-align: center;
-  }
+/* Heading style */
+h1 {
+  color: #1db954;
+  text-align: center;
+  margin-bottom: 20px;
+}
 
-  /* Container for dropdown and button */
-  .search-container {
-    text-align: center;
+.search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 20px;
   }
 
-  /* Select dropdown style */
-  #artists {
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 200px;
-    margin-bottom: 10px;
-  }
 
-  /* Search button style */
-  button {
-    padding: 10px 20px;
-    background-color: #1db954;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
 
-  button:hover {
-    background-color: #1ed760;
-  }
-
-  /* Results container style */
-  #results-container {
-    margin-top: 20px;
-    text-align: center;
-  }
-
-  /* Individual track style */
-  /* Individual track style */
-.track {
-  padding: 10px;
-  margin: 5px; /* Adjusted margin */
-  border: 1px solid #ccc;
-  border-radius: 1px;
-  text-align: center; /* Center content within the track */
+/* Track details container */
+.track-details {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
+/* Track title */
+.track-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
 
-  .track a {
-    display: block;
-    margin-top: 10px;
-  }
+/* Artist name and release year */
+.artist-release {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
 
-  /* Logout button style */
-  #logout-button {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    background-color: #ff3b3b;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+/* Spotify embed style */
+iframe {
+  width: 100%;
+  height: 300px;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
 
-  #logout-button:hover {
-    background-color: #ff5e5e;
-  }
+/* Container for dropdown and button */
+.search-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Select dropdown style */
+#artists {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 250px;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+/* Search button style */
+button {
+  padding: 10px 20px;
+  background-color: #1db954;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #1ed760;
+}
+
+/* Results container style */
+ #results-container {
+   width: 100%;
+   max-width: 600px;
+   text-align: center;
+   margin-top: 20px;
+ }
+
+ /* Tracks container style */
+ .tracks {
+   display: flex;
+   flex-direction: column;
+   gap: 15px;
+ }
+
+ /* Individual track style */
+ .track {
+   padding: 15px;
+   margin: 0 auto;
+   border: 1px solid #ccc;
+   border-radius: 8px;
+   background-color: #fff;
+   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+   width: 100%;
+   max-width: 500px; /* Increased max-width for larger display */
+ }
+
+ .track p {
+   margin: 0;
+   font-size: 16px;
+   font-weight: bold;
+ }
+
+ .track a {
+   display: block;
+   margin-top: 10px;
+   color: #1db954;
+   text-decoration: none;
+   font-size: 14px;
+ }
+
+ .track a:hover {
+   text-decoration: underline;
+ }
+
+/* Logout button style */
+#logout-button {
+  display: block;
+  margin: 30px auto;
+  padding: 10px 20px;
+  background-color: #ff3b3b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+#logout-button:hover {
+  background-color: #ff5e5e;
+}
+
+/* Back button style */
+#back-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #555;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+#back-button:hover {
+  background-color: #777;
+}
 </style>
 </head>
 <body>
 
-<h1>Spotify API Search</h1>
+  <h1>Spotify API Search</h1>
 
-<div class="search-container">
-  <select id="artists">
-    <option value="0">Select a mood...</option>
-    <option value="4dpARuHxo51G3z768sgnrY">Adele</option>
-    <option value="3TVXtAsR1Inumwj472S9r4">Drake</option>
-    <option value="6qqNVTkY8uBg9cP3Jd7DAH">Billie Eilish</option>
-    <option value="1Xyo4u8uXC1ZmMpatF05PJ">The Weeknd</option>
-    <option value="0du5cEVh5yTK9QJze8zA0C">Bruno Mars</option>
-  </select>
+  <div class="search-container">
+    <select id="artists">
+      <option value="0">Select an artist...</option>
+      <option value="4dpARuHxo51G3z768sgnrY">Adele</option>
+      <option value="3TVXtAsR1Inumwj472S9r4">Drake</option>
+      <option value="6qqNVTkY8uBg9cP3Jd7DAH">Billie Eilish</option>
+      <option value="1Xyo4u8uXC1ZmMpatF05PJ">The Weeknd</option>
+      <option value="0du5cEVh5yTK9QJze8zA0C">Bruno Mars</option>
+    </select>
 
-  <button onclick="searchSongs()">Search</button>
-</div>
+    <button onclick="searchSongs()">Search</button>
+  </div>
 
-<div id="results-container">
-  <div id="results"></div>
-</div>
+  <div id="results-container">
+    <div id="results"></div>
+  </div>
 
-<!-- Logout button -->
-<button id="logout-button">Logout</button>
+  <button id="logout-button">Logout</button>
 
-<script>
-$(document).ready(function() {
-  // Attach event listener to logout button
-  $("#logout-button").click(function() {
-    // Redirect to index.html
-    window.location.href = "index.html";
+  <script>
+  $(document).ready(function() {
+    // Attach event listener to logout button
+    $("#logout-button").click(function() {
+      // Redirect to index.html
+      window.location.href = "index.html";
+    });
+
+    // Retrieve stored search results and selected artist from sessionStorage
+    const storedResults = sessionStorage.getItem('searchResults');
+    const selectedArtist = sessionStorage.getItem('selectedArtist');
+
+    if (storedResults && selectedArtist) {
+      $('#artists').val(selectedArtist);
+      $('#results').html(storedResults);
+    }
   });
-});
 
 function searchSongs() {
   var selectedArtist = $("#artists").val();
@@ -127,6 +231,9 @@ function searchSongs() {
     alert("Please select an artist.");
     return;
   }
+
+  // Store selected artist in sessionStorage
+  sessionStorage.setItem('selectedArtist', selectedArtist);
 
   // Client ID and Client Secret
   var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
@@ -155,7 +262,6 @@ function searchSongs() {
 function searchTopTracks(artistId, accessToken) {
   var apiUrl = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?country=PH";
 
-  // Check if access token is available
   if (!accessToken) {
     console.log("Access token not available.");
     return;
@@ -183,12 +289,14 @@ function displayResults(data) {
   for (var i = 0; i < 5; i++) {
     var trackName = tracks[i].name;
     var trackId = tracks[i].id;
+    var artistName = tracks[i].artists[0].name;
+    var releaseYear = new Date(tracks[i].album.release_date).getFullYear();
     var previewUrl = tracks[i].preview_url;
     var spotifyUrl = "https://open.spotify.com/track/" + trackId;
     html += "<div class='track'>";
-    html += "<p><strong>" + trackName + "</strong></p>";
+    html += '<p><a href="track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
     if (previewUrl) {
-      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
+      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
     } else {
       html += "<p>(Preview not available)</p>";
     }
@@ -197,8 +305,17 @@ function displayResults(data) {
   }
   html += "</div>";
   $("#results").html(html);
+
+  // Store search results in sessionStorage
+  sessionStorage.setItem('searchResults', html);
 }
 
+function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
+  sessionStorage.setItem('trackId', trackId);
+  sessionStorage.setItem('trackName', trackName);
+  sessionStorage.setItem('artistName', artistName);
+  sessionStorage.setItem('releaseYear', releaseYear);
+}
 </script>
 
 </body>
