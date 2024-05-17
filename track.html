@@ -173,10 +173,10 @@ $(document).ready(function() {
   });
 
   // Get track details from local storage
-  var trackId = localStorage.getItem('trackId');
-  var trackName = localStorage.getItem('trackName');
-  var artistName = localStorage.getItem('artistName');
-  var releaseYear = localStorage.getItem('releaseYear');
+  var trackId = sessionStorage.getItem('trackId');
+  var trackName = sessionStorage.getItem('trackName');
+  var artistName = sessionStorage.getItem('artistName');
+  var releaseYear = sessionStorage.getItem('releaseYear');
 
   // Display track details
   var trackDetailsHtml = '<div class="track-title">' + trackName + '</div>';
@@ -266,10 +266,10 @@ function displayResults(data) {
 }
 
 function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
-  localStorage.setItem('trackId', trackId);
-  localStorage.setItem('trackName', trackName);
-  localStorage.setItem('artistName', artistName);
-  localStorage.setItem('releaseYear', releaseYear);
+  sessionStorage.setItem('trackId', trackId);
+  sessionStorage.setItem('trackName', trackName);
+  sessionStorage.setItem('artistName', artistName);
+  sessionStorage.setItem('releaseYear', releaseYear);
 }
 </script>
 
