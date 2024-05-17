@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spotify API Search</title>
+<title>Spotify API Mood Search</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
 /* Body style */
@@ -25,14 +25,13 @@ h1 {
   margin-bottom: 20px;
 }
 
+/* Search container */
 .search-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
 
 /* Track details container */
 .track-details {
@@ -68,16 +67,8 @@ iframe {
   margin-bottom: 20px;
 }
 
-/* Container for dropdown and button */
-.search-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
 /* Select dropdown style */
-#artists {
+#moods {
   padding: 10px;
   border-radius: 4px;
   border: 1px solid #ccc;
@@ -103,49 +94,49 @@ button:hover {
 }
 
 /* Results container style */
- #results-container {
-   width: 100%;
-   max-width: 600px;
-   text-align: center;
-   margin-top: 20px;
- }
+#results-container {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  margin-top: 20px;
+}
 
- /* Tracks container style */
- .tracks {
-   display: flex;
-   flex-direction: column;
-   gap: 15px;
- }
+/* Tracks container style */
+.tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
 
- /* Individual track style */
- .track {
-   padding: 15px;
-   margin: 0 auto;
-   border: 1px solid #ccc;
-   border-radius: 8px;
-   background-color: #fff;
-   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-   width: 100%;
-   max-width: 500px; /* Increased max-width for larger display */
- }
+/* Individual track style */
+.track {
+  padding: 15px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px; /* Increased max-width for larger display */
+}
 
- .track p {
-   margin: 0;
-   font-size: 16px;
-   font-weight: bold;
- }
+.track p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+}
 
- .track a {
-   display: block;
-   margin-top: 10px;
-   color: #1db954;
-   text-decoration: none;
-   font-size: 14px;
- }
+.track a {
+  display: block;
+  margin-top: 10px;
+  color: #1db954;
+  text-decoration: none;
+  font-size: 14px;
+}
 
- .track a:hover {
-   text-decoration: underline;
- }
+.track a:hover {
+  text-decoration: underline;
+}
 
 /* Logout button style */
 #logout-button {
@@ -186,54 +177,53 @@ button:hover {
 </head>
 <body>
 
-  <h1>Spotify API Search</h1>
+<h1>Spotify API Mood Search</h1>
 
-  <div class="search-container">
-    <select id="artists">
-      <option value="0">Select an artist...</option>
-      <option value="4dpARuHxo51G3z768sgnrY">Adele</option>
-      <option value="3TVXtAsR1Inumwj472S9r4">Drake</option>
-      <option value="6qqNVTkY8uBg9cP3Jd7DAH">Billie Eilish</option>
-      <option value="1Xyo4u8uXC1ZmMpatF05PJ">The Weeknd</option>
-      <option value="0du5cEVh5yTK9QJze8zA0C">Bruno Mars</option>
-    </select>
+<div class="search-container">
+  <select id="moods">
+    <option value="0">Select a mood...</option>
+    <option value="chill">Chill</option>
+    <option value="sad">Sad</option>
+    <option value="happy">Happy</option>
+    <option value="angry">Angry</option>
+  </select>
 
-    <button onclick="searchSongs()">Search</button>
-  </div>
+  <button onclick="searchSongs()">Search</button>
+</div>
 
-  <div id="results-container">
-    <div id="results"></div>
-  </div>
+<div id="results-container">
+  <div id="results"></div>
+</div>
 
-  <button id="logout-button">Logout</button>
+<button id="logout-button">Logout</button>
 
-  <script>
-  $(document).ready(function() {
-    // Attach event listener to logout button
-    $("#logout-button").click(function() {
-      // Redirect to index.html
-      window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-    });
-
-    // Retrieve stored search results and selected artist from sessionStorage
-    const storedResults = sessionStorage.getItem('searchResults');
-    const selectedArtist = sessionStorage.getItem('selectedArtist');
-
-    if (storedResults && selectedArtist) {
-      $('#artists').val(selectedArtist);
-      $('#results').html(storedResults);
-    }
+<script>
+$(document).ready(function() {
+  // Attach event listener to logout button
+  $("#logout-button").click(function() {
+    // Redirect to index.html
+    window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
   });
 
+  // Retrieve stored search results and selected mood from sessionStorage
+  const storedResults = sessionStorage.getItem('searchResults');
+  const selectedMood = sessionStorage.getItem('selectedMood');
+
+  if (storedResults && selectedMood) {
+    $('#moods').val(selectedMood);
+    $('#results').html(storedResults);
+  }
+});
+
 function searchSongs() {
-  var selectedArtist = $("#artists").val();
-  if (selectedArtist == "0") {
-    alert("Please select an artist.");
+  var selectedMood = $("#moods").val();
+  if (selectedMood == "0") {
+    alert("Please select a mood.");
     return;
   }
 
-  // Store selected artist in sessionStorage
-  sessionStorage.setItem('selectedArtist', selectedArtist);
+  // Store selected mood in sessionStorage
+  sessionStorage.setItem('selectedMood', selectedMood);
 
   // Client ID and Client Secret
   var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
@@ -251,7 +241,7 @@ function searchSongs() {
     },
     success: function(response) {
       var accessToken = response.access_token;
-      searchTopTracks(selectedArtist, accessToken);
+      searchRecommendedTracks(selectedMood, accessToken);
     },
     error: function(xhr, status, error) {
       console.log(error);
@@ -259,8 +249,9 @@ function searchSongs() {
   });
 }
 
-function searchTopTracks(artistId, accessToken) {
-  var apiUrl = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?country=PH";
+function searchRecommendedTracks(mood, accessToken) {
+  // Use Spotify's recommendation API to get recommended tracks based on mood
+  var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
 
   if (!accessToken) {
     console.log("Access token not available.");
@@ -284,24 +275,24 @@ function searchTopTracks(artistId, accessToken) {
 
 function displayResults(data) {
   var tracks = data.tracks;
-  var html = "<h2>Top 5 Tracks</h2>";
+  var html = "<h2>Recommended Tracks</h2>";
   html += "<div class='tracks'>";
-  for (var i = 0; i < 5; i++) {
+  var count = 0;
+  for (var i = 0; i < tracks.length && count < 5; i++) {
     var trackName = tracks[i].name;
     var trackId = tracks[i].id;
     var artistName = tracks[i].artists[0].name;
     var releaseYear = new Date(tracks[i].album.release_date).getFullYear();
     var previewUrl = tracks[i].preview_url;
     var spotifyUrl = "https://open.spotify.com/track/" + trackId;
-    html += "<div class='track'>";
-    html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
     if (previewUrl) {
+      html += "<div class='track'>";
+      html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
       html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
-    } else {
-      html += "<p>(Preview not available)</p>";
+      html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
+      html += "</div>";
+      count++;
     }
-    html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
-    html += "</div>";
   }
   html += "</div>";
   $("#results").html(html);
@@ -317,6 +308,7 @@ function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
   sessionStorage.setItem('releaseYear', releaseYear);
 }
 </script>
+
 
 </body>
 </html>
