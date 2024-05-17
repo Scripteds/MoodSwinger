@@ -232,13 +232,17 @@ function searchTopTracks(artistId, accessToken) {
       "Authorization": "Bearer " + accessToken
     },
     success: function(response) {
+      // Display results on second_page.html
       displayResults(response);
+      // Redirect to second_page.html
+      window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html";
     },
     error: function(xhr, status, error) {
       console.log(error);
     }
   });
 }
+
 
 function displayResults(data) {
   var tracks = data.tracks;
