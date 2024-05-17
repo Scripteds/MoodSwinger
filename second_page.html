@@ -212,7 +212,7 @@ button:hover {
     // Attach event listener to logout button
     $("#logout-button").click(function() {
       // Redirect to index.html
-      window.location.href = "index.html";
+      window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
 
     // Retrieve stored search results and selected artist from sessionStorage
@@ -294,7 +294,7 @@ function displayResults(data) {
     var previewUrl = tracks[i].preview_url;
     var spotifyUrl = "https://open.spotify.com/track/" + trackId;
     html += "<div class='track'>";
-    html += '<p><a href="track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
+    html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
     if (previewUrl) {
       html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
     } else {
