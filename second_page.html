@@ -222,14 +222,14 @@ function fetchSpotifyProfile(accessToken) {
     headers: {
       'Authorization': 'Bearer ' + accessToken
     },
-    success: function(response) {
-      console.log('Profile Data:', response); // Log the profile data
-      // On success, display user's profile picture
-      displayProfilePicture(response.images[0].url);
-    },
-    error: function(xhr, status, error) {
-      console.error('Error fetching user profile:', error);
-    }
+success: function(response) {
+  console.log('Profile Picture URL:', response.images[0].url); // Add this line
+  // On success, display user's profile picture
+  displayProfilePicture(response.images[0].url);
+},
+error: function(xhr, status, error) {
+  console.error('Error fetching user profile:', error);
+}
   });
 }
 
