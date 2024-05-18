@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spotify Mood Tracks</title>
+<title>Track Details</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
   /* Body style */
@@ -25,59 +25,50 @@
     margin-bottom: 20px;
   }
 
-  /* Profile picture style */
-  #profile-picture {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    overflow: hidden;
-  }
-
-  #profile-image {
+  /* Track details container */
+  .track-details {
     width: 100%;
-    height: 100%;
-  }
-
-  /* Profile picture dropdown style */
-  .profile-dropdown {
-    position: absolute;
-    top: 70px;
-    right: 20px;
+    max-width: 800px;
+    text-align: center;
     background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 20px;
+    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 1;
-    display: none;
+    margin-bottom: 20px;
   }
 
-  #profile-picture:hover .profile-dropdown {
-    display: block;
+  /* Track title */
+  .track-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
   }
 
-  /* Profile dropdown item style */
-  .profile-dropdown-item {
-    padding: 10px;
-    cursor: pointer;
+  /* Artist name and release year */
+  .artist-release {
+    font-size: 18px;
+    margin-bottom: 20px;
   }
 
-  .profile-dropdown-item:hover {
-    background-color: #f0f0f0;
+  /* Spotify embed style */
+  iframe {
+    width: 100%;
+    height: 300px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 20px;
   }
 
-  /* Search container style */
+  /* Container for dropdown and button */
   .search-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 100px; /* Adjusted to account for profile picture */
+    margin-bottom: 20px;
   }
 
   /* Select dropdown style */
-  #dropdown {
+  #artists {
     padding: 10px;
     border-radius: 4px;
     border: 1px solid #ccc;
@@ -102,165 +93,187 @@
     background-color: #1ed760;
   }
 
-  /* Results container */
-  .results-container {
-    width: 100%;
-    max-width: 800px;
-    margin-top: 20px;
+  /* Logout button style */
+  #logout-button {
+    display: block;
+    margin: 30px auto;
+    padding: 10px 20px;
+    background-color: #ff3b3b;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
   }
 
-  .track {
-    margin-bottom: 20px;
+  #logout-button:hover {
+    background-color: #ff5e5e;
   }
 
-  .track p {
-    margin: 5px 0;
+  /* Back button style */
+  #back-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+
+  #back-button:hover {
+    background-color: #777;
   }
 </style>
 </head>
 <body>
 
-<h1>Spotify API Mood Search</h1>
+<h1>Track Details</h1>
 
-<!-- Profile picture with dropdown -->
-<div id="profile-picture">
-  <img src="" alt="Profile Picture" id="profile-image">
-  <div class="profile-dropdown">
-    <div class="profile-dropdown-item" onclick="logout()">Logout</div>
-  </div>
+<div class="track-details" id="track-details">
+  <!-- Track details will be populated here -->
 </div>
 
-<!-- Search container -->
+<!-- Back button -->
+<button id="back-button">Back</button>
+
+<!-- Reuse search container from the main page -->
 <div class="search-container">
-  <select id="dropdown">
-    <option value="0">Select a mood...</option>
-    <option value="chill">Chill</option>
-    <option value="happy">Happy</option>
-    <option value="sad">Sad</option>
+  <select id="artists">
+    <option value="0">Select an artist...</option>
+    <option value="4dpARuHxo51G3z768sgnrY">Adele</option>
+    <option value="3TVXtAsR1Inumwj472S9r4">Drake</option>
+    <option value="6qqNVTkY8uBg9cP3Jd7DAH">Billie Eilish</option>
+    <option value="1Xyo4u8uXC1ZmMpatF05PJ">The Weeknd</option>
+    <option value="0du5cEVh5yTK9QJze8zA0C">Bruno Mars</option>
   </select>
 
   <button onclick="searchSongs()">Search</button>
 </div>
 
-<!-- Results container -->
-<div id="results" class="results-container"></div>
+<!-- Logout button -->
+<button id="logout-button">Logout</button>
 
 <script>
 $(document).ready(function() {
-  // Check if access token is present in URL hash
-  var accessToken = getAccessTokenFromURL();
-  if (accessToken) {
-    // Fetch user's profile data and display profile picture
-    fetchSpotifyProfile(accessToken);
-  }
+  // Attach event listener to logout button
+  $("#logout-button").click(function() {
+    // Redirect to index.html
+    window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+  });
+
+  // Attach event listener to back button
+  $("#back-button").click(function() {
+    // Navigate back to second_page.html
+    window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html";
+  });
+
+  // Get track details from local storage
+  var trackId = sessionStorage.getItem('trackId');
+  var trackName = sessionStorage.getItem('trackName');
+  var artistName = sessionStorage.getItem('artistName');
+  var releaseYear = sessionStorage.getItem('releaseYear');
+
+  // Display track details
+  var trackDetailsHtml = '<div class="track-title">' + trackName + '</div>';
+  trackDetailsHtml += '<div class="artist-release">' + artistName + ' - ' + releaseYear + '</div>';
+  trackDetailsHtml += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" allowtransparency="true" allow="encrypted-media"></iframe>';
+  $('#track-details').html(trackDetailsHtml);
 });
 
-function fetchSpotifyProfile(accessToken) {
-  // Make a GET request to Spotify API to fetch user's profile data
-  $.ajax({
-    url: 'https://api.spotify.com/v1/me',
-    type: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + accessToken
-    },
-    success: function(response) {
-      // Display user's profile picture
-      displayProfilePicture(response.images[0].url);
-    },
-    error: function(xhr, status, error) {
-      console.error('Error fetching user profile:', error);
-    }
-  });
-}
-
-function displayProfilePicture(profilePictureUrl) {
-  // Display user's profile picture
-  var profilePictureImg = document.getElementById('profile-image');
-  profilePictureImg.src = profilePictureUrl;
-}
-
-function logout() {
-  // Redirect to logout URL or perform logout action
-  window.location.href = "index.html"; // Replace with actual logout URL or action
-}
-
-function getAccessTokenFromURL() {
-  var hash = window.location.hash.substring(1);
-  var params = hash.split('&');
-  for (var i = 0; i < params.length; i++) {
-    var param = params[i].split('=');
-    if (param[0] === 'access_token') {
-      return param[1];
-    }
-  }
-  return null;
-}
-
 function searchSongs() {
-  var selectedMood = $("#dropdown").val();
-  if (selectedMood == "0") {
-    alert("Please select a mood.");
+  var selectedArtist = $("#artists").val();
+  if (selectedArtist == "0") {
+    alert("Please select an artist.");
     return;
   }
 
-  var accessToken = getAccessTokenFromURL();
-  if (!accessToken) {
-    alert("Access token not found. Please login again.");
-    return;
-  }
+  // Client ID and Client Secret
+  var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
+  var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
 
-  var playlistId;
-  switch (selectedMood) {
-    case 'chill':
-      playlistId = '37i9dQZF1DX889U0CL85jj'; // Chill playlist
-      break;
-    case 'happy':
-      playlistId = '37i9dQZF1DXdPec7aLTmlC'; // Happy playlist
-      break;
-    case 'sad':
-      playlistId = '37i9dQZF1DX7qK8ma5wgG1'; // Sad playlist
-      break;
-    default:
-      alert("Invalid mood selected.");
-      return;
-  }
-
+  // Request access token
   $.ajax({
-    url: 'https://api.spotify.com/v1/playlists/' + playlistId + '/tracks',
-    type: 'GET',
+    url: "https://accounts.spotify.com/api/token",
+    type: "POST",
     headers: {
-      'Authorization': 'Bearer ' + accessToken
+      "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
+    },
+    data: {
+      "grant_type": "client_credentials"
     },
     success: function(response) {
-      displayResults(response.items);
+      var accessToken = response.access_token;
+      searchTopTracks(selectedArtist, accessToken);
     },
     error: function(xhr, status, error) {
-      console.error('Error fetching playlist tracks:', error);
+      console.log(error);
     }
   });
 }
 
-function displayResults(tracks) {
-  var html = "<h2>Top Tracks</h2>";
-  for (var i = 0; i < tracks.length; i++) {
-    var track = tracks[i].track;
-    var trackName = track.name;
-    var trackId = track.id;
-    var artistName = track.artists[0].name;
-    var releaseYear = new Date(track.album.release_date).getFullYear();
-    var previewUrl = track.preview_url;
+function searchTopTracks(artistId, accessToken) {
+  var apiUrl = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?country=PH";
+
+  // Check if access token is available
+  if (!accessToken) {
+    console.log("Access token not available.");
+    return;
+  }
+
+  $.ajax({
+    url: apiUrl,
+    type: "GET",
+    headers: {
+      "Authorization": "Bearer " + accessToken
+    },
+    success: function(response) {
+      // Display results on second_page.html
+      displayResults(response);
+      // Redirect to second_page.html
+      window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html";
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
+    }
+  });
+}
+
+
+function displayResults(data) {
+  var tracks = data.tracks;
+  var html = "<h2>Top 5 Tracks</h2>";
+  html += "<div class='tracks'>";
+  for (var i = 0; i < 5; i++) {
+    var trackName = tracks[i].name;
+    var trackId = tracks[i].id;
+    var artistName = tracks[i].artists[0].name; // Get the artist name
+    var releaseYear = new Date(tracks[i].album.release_date).getFullYear(); // Get the release year
+    var previewUrl = tracks[i].preview_url;
     var spotifyUrl = "https://open.spotify.com/track/" + trackId;
     html += "<div class='track'>";
-    html += '<p>' + trackName + ' by ' + artistName + ' (' + releaseYear + ')</p>';
+    html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
     if (previewUrl) {
-      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
+      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
     } else {
       html += "<p>(Preview not available)</p>";
     }
     html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
     html += "</div>";
   }
+  html += "</div>";
   $("#results").html(html);
+}
+
+function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
+  sessionStorage.setItem('trackId', trackId);
+  sessionStorage.setItem('trackName', trackName);
+  sessionStorage.setItem('artistName', artistName);
+  sessionStorage.setItem('releaseYear', releaseYear);
 }
 </script>
 
