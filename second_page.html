@@ -234,8 +234,9 @@ function fetchSpotifyProfile(accessToken) {
 function displayProfilePicture(profilePictureUrl) {
   // Display user's profile picture
   var profilePictureDiv = document.getElementById('profile-picture');
-  profilePictureDiv.innerHTML = `<img src="${profilePictureUrl}" alt="Profile Picture">`;
+  profilePictureDiv.innerHTML = `<img src="${profilePictureUrl}" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%;">`;
 }
+
 
 // Function to extract access token from URL hash
 function getAccessTokenFromURL() {
