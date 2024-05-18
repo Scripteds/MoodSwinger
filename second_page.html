@@ -156,28 +156,20 @@ button:hover {
   background-color: #ff5e5e;
 }
 
-/* Back button style */
-#back-button {
-  display: block;
-  margin: 20px auto;
-  padding: 10px 20px;
-  background-color: #555;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-}
-
-#back-button:hover {
-  background-color: #777;
+/* Profile picture style */
+#profile-picture {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-top: 20px;
 }
 </style>
 </head>
 <body>
 
 <h1>Spotify API Mood Search</h1>
+
+<div id="profile-picture"></div> <!-- Profile picture will be displayed here -->
 
 <div class="search-container">
   <select id="moods">
@@ -212,102 +204,53 @@ $(document).ready(function() {
     $('#moods').val(selectedMood);
     $('#results').html(storedResults);
   }
+
+ // Check if the access token is present in the URL hash
+  var accessToken = getAccessTokenFromURL();
+  if (accessToken) {
+    // If access token is present, fetch user's profile data
+    fetchSpotifyProfile(accessToken);
+  }
 });
 
-function searchSongs() {
-  var selectedMood = $("#moods").val();
-  if (selectedMood == "0") {
-    alert("Please select a mood.");
-    return;
-  }
-
-  // Store selected mood in sessionStorage
-  sessionStorage.setItem('selectedMood', selectedMood);
-
-  // Client ID and Client Secret
-  var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
-  var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
-
-  // Request access token
+function fetchSpotifyProfile(accessToken) {
+  // Make a GET request to Spotify API to fetch user's profile data
   $.ajax({
-    url: "https://accounts.spotify.com/api/token",
-    type: "POST",
+    url: 'https://api.spotify.com/v1/me',
+    type: 'GET',
     headers: {
-      "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
-    },
-    data: {
-      "grant_type": "client_credentials"
+      'Authorization': 'Bearer ' + accessToken
     },
     success: function(response) {
-      var accessToken = response.access_token;
-      searchRecommendedTracks(selectedMood, accessToken);
+      // On success, display user's profile picture
+      displayProfilePicture(response.images[0].url);
     },
     error: function(xhr, status, error) {
-      console.log(error);
+      console.error('Error fetching user profile:', error);
     }
   });
 }
 
-function searchRecommendedTracks(mood, accessToken) {
-  // Use Spotify's recommendation API to get recommended tracks based on mood
-  var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
-
-  if (!accessToken) {
-    console.log("Access token not available.");
-    return;
-  }
-
-  $.ajax({
-    url: apiUrl,
-    type: "GET",
-    headers: {
-      "Authorization": "Bearer " + accessToken
-    },
-    success: function(response) {
-      displayResults(response);
-    },
-    error: function(xhr, status, error) {
-      console.log(error);
-    }
-  });
+function displayProfilePicture(profilePictureUrl) {
+  // Display user's profile picture
+  var profilePictureDiv = document.getElementById('profile-picture');
+  profilePictureDiv.innerHTML = `<img src="${profilePictureUrl}" alt="Profile Picture">`;
 }
 
-function displayResults(data) {
-  var tracks = data.tracks;
-  var html = "<h2>Recommended Tracks</h2>";
-  html += "<div class='tracks'>";
-  var count = 0;
-  for (var i = 0; i < tracks.length && count < 5; i++) {
-    var trackName = tracks[i].name;
-    var trackId = tracks[i].id;
-    var artistName = tracks[i].artists[0].name;
-    var releaseYear = new Date(tracks[i].album.release_date).getFullYear();
-    var previewUrl = tracks[i].preview_url;
-    var spotifyUrl = "https://open.spotify.com/track/" + trackId;
-    if (previewUrl) {
-      html += "<div class='track'>";
-      html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
-      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
-      html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
-      html += "</div>";
-      count++;
+// Function to extract access token from URL hash
+function getAccessTokenFromURL() {
+  var hash = window.location.hash.substring(1);
+  var params = hash.split('&');
+  for (var i = 0; i < params.length; i++) {
+    var param = params[i].split('=');
+    if (param[0] === 'access_token') {
+      return param[1];
     }
   }
-  html += "</div>";
-  $("#results").html(html);
-
-  // Store search results in sessionStorage
-  sessionStorage.setItem('searchResults', html);
-}
-
-function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
-  sessionStorage.setItem('trackId', trackId);
-  sessionStorage.setItem('trackName', trackName);
-  sessionStorage.setItem('artistName', artistName);
-  sessionStorage.setItem('releaseYear', releaseYear);
+  return null; // Access token not found in URL hash
 }
 </script>
 
-
 </body>
 </html>
+
