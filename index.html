@@ -9,7 +9,17 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        /* Container style */
+        .container {
+            text-align: center;
         }
 
         /* Heading style */
@@ -29,17 +39,17 @@
             border-radius: 4px;
             border: 1px solid #ccc;
             width: 200px;
+            margin-bottom: 10px;
         }
 
         /* Login button style */
         .spotify-login-btn {
-            display: inline-block;
             background-color: #1db954;
             color: #fff;
             padding: 10px 20px;
             text-decoration: none;
             border-radius: 4px;
-            margin-top: 10px;
+            transition: background-color 0.3s;
         }
 
         .spotify-login-btn:hover {
@@ -48,17 +58,19 @@
     </style>
 </head>
 <body>
-    <h2>Spotify Login</h2>
-    <p>Select a playlist:</p>
-    <select id="dropdown" disabled>
-        <option value="playlist1">Select a mood...</option>
-        <option value="playlist2">Playlist 2</option>
-        <option value="playlist3">Playlist 3</option>
-        <option value="playlist4">Playlist 4</option>
-        <option value="playlist5">Playlist 5</option>
-    </select>
-    <br><br>
-    <a href="https://accounts.spotify.com/authorize?client_id=a80fcf0c3aae4aabb6f6b6721183b72e&response_type=code&redirect_uri=https://scripteds.github.io/MoodSwinger/second_page.html&scope=user-read-private%20user-read-email&state=STATE&show_dialog=true" class="spotify-login-btn">Login with Spotify</a>
+    <div class="container">
+        <h2>Spotify Login</h2>
+        <p>Select a playlist:</p>
+        <select id="dropdown" disabled>
+            <option value="playlist1">Select a mood...</option>
+            <option value="playlist2">Playlist 2</option>
+            <option value="playlist3">Playlist 3</option>
+            <option value="playlist4">Playlist 4</option>
+            <option value="playlist5">Playlist 5</option>
+        </select>
+        <br><br>
+        <a href="https://accounts.spotify.com/authorize?client_id=a80fcf0c3aae4aabb6f6b6721183b72e&response_type=code&redirect_uri=https://scripteds.github.io/MoodSwinger/second_page.html&scope=user-read-private%20user-read-email&state=STATE&show_dialog=true" class="spotify-login-btn">Login with Spotify</a>
+    </div>
 
     <script>
         // Function to enable the dropdown
