@@ -68,7 +68,7 @@
   }
 
   /* Select dropdown style */
-  #artists {
+  #mood {
     padding: 10px;
     border-radius: 4px;
     border: 1px solid #ccc;
@@ -141,6 +141,13 @@
 <!-- Back button -->
 <button id="back-button">Back</button>
 
+<div class="search-container">
+  <select id="mood">
+    <option value="0">Select Mood</option>
+    <option value="chill">Chill</option>
+    <option value="sad">Sad</option>
+    <option value="happy">Happy</option>
+  </select>
   <button onclick="searchSongs()">Search</button>
 </div>
 
@@ -175,11 +182,20 @@ $(document).ready(function() {
 });
 
 function searchSongs() {
-  var selectedArtist = $("#artists").val();
-  if (selectedArtist == "0") {
-    alert("Please select an artist.");
+  var selectedMood = $("#mood").val();
+  if (selectedMood == "0") {
+    alert("Please select a mood.");
     return;
   }
+
+  // Define artists for each mood
+  var artists = {
+    "chill": "artist_id_chill",  // replace with actual artist IDs
+    "sad": "artist_id_sad",
+    "happy": "artist_id_happy"
+  };
+
+  var selectedArtistId = artists[selectedMood];
 
   // Client ID and Client Secret
   var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
@@ -197,7 +213,7 @@ function searchSongs() {
     },
     success: function(response) {
       var accessToken = response.access_token;
-      searchTopTracks(selectedArtist, accessToken);
+      searchTopTracks(selectedArtistId, accessToken);
     },
     error: function(xhr, status, error) {
       console.log(error);
