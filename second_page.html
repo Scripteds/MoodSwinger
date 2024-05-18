@@ -15,7 +15,7 @@ body {
   color: #333;
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* Align items to the right */
+  align-items: center;
 }
 
 /* Heading style */
@@ -25,14 +25,20 @@ h1 {
   margin-bottom: 20px;
 }
 
+/* Profile picture container style */
+.profile-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
 /* Profile picture style */
 #profile-picture {
-  position: relative;
   width: 50px;
   height: 50px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 20px; /* Add margin to separate from dropdown */
+  cursor: pointer;
 }
 
 /* Profile picture dropdown style */
@@ -68,10 +74,12 @@ h1 {
 <h1>Spotify API Mood Search</h1>
 
 <!-- Profile picture with dropdown -->
-<div id="profile-picture">
-  <img src="" alt="Profile Picture" id="profile-image">
-  <div class="profile-dropdown">
-    <div class="profile-dropdown-item" onclick="logout()">Logout</div>
+<div class="profile-container">
+  <div id="profile-picture">
+    <img src="" alt="Profile Picture" id="profile-image">
+    <div class="profile-dropdown">
+      <div class="profile-dropdown-item" onclick="logout()">Logout</div>
+    </div>
   </div>
 </div>
 
