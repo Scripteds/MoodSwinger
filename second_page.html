@@ -33,40 +33,6 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* Track details container */
-.track-details {
-  width: 100%;
-  max-width: 800px;
-  text-align: center;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-/* Track title */
-.track-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-/* Artist name and release year */
-.artist-release {
-  font-size: 18px;
-  margin-bottom: 20px;
-}
-
-/* Spotify embed style */
-iframe {
-  width: 100%;
-  height: 300px;
-  border: none;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
 /* Select dropdown style */
 #moods {
   padding: 10px;
@@ -91,69 +57,6 @@ button {
 
 button:hover {
   background-color: #1ed760;
-}
-
-/* Results container style */
-#results-container {
-  width: 100%;
-  max-width: 600px;
-  text-align: center;
-  margin-top: 20px;
-}
-
-/* Tracks container style */
-.tracks {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* Individual track style */
-.track {
-  padding: 15px;
-  margin: 0 auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 500px; /* Increased max-width for larger display */
-}
-
-.track p {
-  margin: 0;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.track a {
-  display: block;
-  margin-top: 10px;
-  color: #1db954;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.track a:hover {
-  text-decoration: underline;
-}
-
-/* Logout button style */
-#logout-button {
-  display: block;
-  margin: 30px auto;
-  padding: 10px 20px;
-  background-color: #ff3b3b;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-}
-
-#logout-button:hover {
-  background-color: #ff5e5e;
 }
 
 /* Profile picture style */
@@ -182,39 +85,17 @@ button:hover {
   <button onclick="searchSongs()">Search</button>
 </div>
 
-<div id="results-container">
-  <div id="results"></div>
-</div>
-
-<button id="logout-button">Logout</button>
-
 <script>
 $(document).ready(function() {
-  // Attach event listener to logout button
-  $("#logout-button").click(function() {
-    // Redirect to index.html
-    window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-  });
-
-  // Retrieve stored search results and selected mood from sessionStorage
-  const storedResults = sessionStorage.getItem('searchResults');
-  const selectedMood = sessionStorage.getItem('selectedMood');
-
-  if (storedResults && selectedMood) {
-    $('#moods').val(selectedMood);
-    $('#results').html(storedResults);
-  }
-
- // Check if the access token is present in the URL hash
+  // Check if access token is present in URL hash
   var accessToken = getAccessTokenFromURL();
   if (accessToken) {
-    // If access token is present, fetch user's profile data
+    // Fetch user's profile data and display profile picture
     fetchSpotifyProfile(accessToken);
   }
 });
 
 function fetchSpotifyProfile(accessToken) {
-  console.log('Access Token:', accessToken); // Log the access token
   // Make a GET request to Spotify API to fetch user's profile data
   $.ajax({
     url: 'https://api.spotify.com/v1/me',
@@ -222,25 +103,31 @@ function fetchSpotifyProfile(accessToken) {
     headers: {
       'Authorization': 'Bearer ' + accessToken
     },
-success: function(response) {
-  console.log('Profile Picture URL:', response.images[0].url); // Add this line
-  // On success, display user's profile picture
-  displayProfilePicture(response.images[0].url);
-},
-error: function(xhr, status, error) {
-  console.error('Error fetching user profile:', error);
-}
+    success: function(response) {
+      // Display user's profile picture
+      displayProfilePicture(response.images[0].url);
+    },
+    error: function(xhr, status, error) {
+      console.error('Error fetching user profile:', error);
+    }
   });
 }
 
 function displayProfilePicture(profilePictureUrl) {
   // Display user's profile picture
   var profilePictureDiv = document.getElementById('profile-picture');
-  profilePictureDiv.innerHTML = `<img src="${profilePictureUrl}" alt="Profile Picture" style="width: 50px; height: 50px; border-radius: 50%;">`;
+  profilePictureDiv.innerHTML = `<img src="${profilePictureUrl}" alt="Profile Picture">`;
 }
 
+function searchSongs() {
+  var selectedMood = $("#moods").val();
+  if (selectedMood == "0") {
+    alert("Please select a mood.");
+    return;
+  }
+  // Add your code for searching songs based on mood here
+}
 
-// Function to extract access token from URL hash
 function getAccessTokenFromURL() {
   var hash = window.location.hash.substring(1);
   var params = hash.split('&');
@@ -250,10 +137,9 @@ function getAccessTokenFromURL() {
       return param[1];
     }
   }
-  return null; // Access token not found in URL hash
+  return null;
 }
 </script>
 
 </body>
 </html>
-
