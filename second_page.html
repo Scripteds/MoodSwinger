@@ -17,12 +17,14 @@ body {
   flex-direction: column;
   align-items: center;
 }
+
 /* Heading style */
 h1 {
   color: #1db954;
   text-align: center;
   margin-bottom: 20px;
 }
+
 /* Search container */
 .search-container {
   display: flex;
@@ -30,6 +32,7 @@ h1 {
   align-items: center;
   margin-bottom: 20px;
 }
+
 /* Track details container */
 .track-details {
   width: 100%;
@@ -41,17 +44,20 @@ h1 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
 }
+
 /* Track title */
 .track-title {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
 }
+
 /* Artist name and release year */
 .artist-release {
   font-size: 18px;
   margin-bottom: 20px;
 }
+
 /* Spotify embed style */
 iframe {
   width: 100%;
@@ -60,6 +66,7 @@ iframe {
   border-radius: 8px;
   margin-bottom: 20px;
 }
+
 /* Select dropdown style */
 #moods {
   padding: 10px;
@@ -69,6 +76,7 @@ iframe {
   margin-bottom: 20px;
   font-size: 16px;
 }
+
 /* Search button style */
 button {
   padding: 10px 20px;
@@ -80,9 +88,11 @@ button {
   font-size: 16px;
   transition: background-color 0.3s;
 }
+
 button:hover {
   background-color: #1ed760;
 }
+
 /* Results container style */
 #results-container {
   width: 100%;
@@ -90,12 +100,14 @@ button:hover {
   text-align: center;
   margin-top: 20px;
 }
+
 /* Tracks container style */
 .tracks {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
+
 /* Individual track style */
 .track {
   padding: 15px;
@@ -107,11 +119,13 @@ button:hover {
   width: 100%;
   max-width: 500px; /* Increased max-width for larger display */
 }
+
 .track p {
   margin: 0;
   font-size: 16px;
   font-weight: bold;
 }
+
 .track a {
   display: block;
   margin-top: 10px;
@@ -119,9 +133,11 @@ button:hover {
   text-decoration: none;
   font-size: 14px;
 }
+
 .track a:hover {
   text-decoration: underline;
 }
+
 /* Logout button style */
 #logout-button {
   display: block;
@@ -135,9 +151,11 @@ button:hover {
   font-size: 16px;
   transition: background-color 0.3s;
 }
+
 #logout-button:hover {
   background-color: #ff5e5e;
 }
+
 /* Back button style */
 #back-button {
   display: block;
@@ -151,13 +169,16 @@ button:hover {
   font-size: 16px;
   transition: background-color 0.3s;
 }
+
 #back-button:hover {
   background-color: #777;
 }
 </style>
 </head>
 <body>
+
 <h1>Spotify API Mood Search</h1>
+
 <div class="search-container">
   <select id="moods">
     <option value="0">Select a mood...</option>
@@ -168,10 +189,13 @@ button:hover {
 
   <button onclick="searchSongs()">Search</button>
 </div>
+
 <div id="results-container">
   <div id="results"></div>
 </div>
+
 <button id="logout-button">Logout</button>
+
 <script>
 $(document).ready(function() {
   // Attach event listener to logout button
@@ -179,25 +203,31 @@ $(document).ready(function() {
     // Redirect to index.html
     window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
   });
+
   // Retrieve stored search results and selected mood from sessionStorage
   const storedResults = sessionStorage.getItem('searchResults');
   const selectedMood = sessionStorage.getItem('selectedMood');
+
   if (storedResults && selectedMood) {
     $('#moods').val(selectedMood);
     $('#results').html(storedResults);
   }
 });
+
 function searchSongs() {
   var selectedMood = $("#moods").val();
   if (selectedMood == "0") {
     alert("Please select a mood.");
     return;
   }
+
   // Store selected mood in sessionStorage
   sessionStorage.setItem('selectedMood', selectedMood);
+
   // Client ID and Client Secret
   var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
   var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
+
   // Request access token
   $.ajax({
     url: "https://accounts.spotify.com/api/token",
@@ -217,13 +247,16 @@ function searchSongs() {
     }
   });
 }
+
 function searchRecommendedTracks(mood, accessToken) {
   // Use Spotify's recommendation API to get recommended tracks based on mood
   var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
+
   if (!accessToken) {
     console.log("Access token not available.");
     return;
   }
+
   $.ajax({
     url: apiUrl,
     type: "GET",
@@ -238,6 +271,7 @@ function searchRecommendedTracks(mood, accessToken) {
     }
   });
 }
+
 function displayResults(data) {
   var tracks = data.tracks;
   var html = "<h2>Recommended Tracks</h2>";
@@ -261,9 +295,11 @@ function displayResults(data) {
   }
   html += "</div>";
   $("#results").html(html);
+
   // Store search results in sessionStorage
   sessionStorage.setItem('searchResults', html);
 }
+
 function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
   sessionStorage.setItem('trackId', trackId);
   sessionStorage.setItem('trackName', trackName);
@@ -271,5 +307,7 @@ function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
   sessionStorage.setItem('releaseYear', releaseYear);
 }
 </script>
+
+
 </body>
 </html>
