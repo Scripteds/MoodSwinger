@@ -214,6 +214,7 @@ $(document).ready(function() {
 });
 
 function fetchSpotifyProfile(accessToken) {
+  console.log('Access Token:', accessToken); // Log the access token
   // Make a GET request to Spotify API to fetch user's profile data
   $.ajax({
     url: 'https://api.spotify.com/v1/me',
@@ -222,6 +223,7 @@ function fetchSpotifyProfile(accessToken) {
       'Authorization': 'Bearer ' + accessToken
     },
     success: function(response) {
+      console.log('Profile Data:', response); // Log the profile data
       // On success, display user's profile picture
       displayProfilePicture(response.images[0].url);
     },
