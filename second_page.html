@@ -6,209 +6,151 @@
 <title>Spotify API Mood Search</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
-/* Body style */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-  background-color: #f9f9f9;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  /* Body style */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f9f9f9;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-/* Heading style */
-h1 {
-  color: #1db954;
-  text-align: center;
-  margin-bottom: 20px;
-}
+  /* Heading style */
+  h1 {
+    color: #1db954;
+    text-align: center;
+    margin-bottom: 20px;
+  }
 
-/* Search container */
-.search-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
+  /* Profile picture style */
+  #profile-picture {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
 
-/* Track details container */
-.track-details {
-  width: 100%;
-  max-width: 800px;
-  text-align: center;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
+  #profile-image {
+    width: 100%;
+    height: 100%;
+  }
 
-/* Track title */
-.track-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
+  /* Profile picture dropdown style */
+  .profile-dropdown {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    display: none;
+  }
 
-/* Artist name and release year */
-.artist-release {
-  font-size: 18px;
-  margin-bottom: 20px;
-}
+  #profile-picture:hover .profile-dropdown {
+    display: block;
+  }
 
-/* Spotify embed style */
-iframe {
-  width: 100%;
-  height: 300px;
-  border: none;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
+  /* Profile dropdown item style */
+  .profile-dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+  }
 
-/* Select dropdown style */
-#moods {
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  width: 250px;
-  margin-bottom: 20px;
-  font-size: 16px;
-}
+  .profile-dropdown-item:hover {
+    background-color: #f0f0f0;
+  }
 
-/* Search button style */
-button {
-  padding: 10px 20px;
-  background-color: #1db954;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-}
+  /* Search container style */
+  .search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 100px; /* Adjusted to account for profile picture */
+  }
 
-button:hover {
-  background-color: #1ed760;
-}
+  /* Select dropdown style */
+  #dropdown {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 250px;
+    margin-bottom: 20px;
+    font-size: 16px;
+  }
 
-/* Results container style */
-#results-container {
-  width: 100%;
-  max-width: 600px;
-  text-align: center;
-  margin-top: 20px;
-}
+  /* Search button style */
+  button {
+    padding: 10px 20px;
+    background-color: #1db954;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
 
-/* Tracks container style */
-.tracks {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+  button:hover {
+    background-color: #1ed760;
+  }
 
-/* Individual track style */
-.track {
-  padding: 15px;
-  margin: 0 auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 500px; /* Increased max-width for larger display */
-}
+  /* Results container */
+  .results-container {
+    width: 100%;
+    max-width: 800px;
+    margin-top: 20px;
+  }
 
-.track p {
-  margin: 0;
-  font-size: 16px;
-  font-weight: bold;
-}
+  .track {
+    margin-bottom: 20px;
+  }
 
-.track a {
-  display: block;
-  margin-top: 10px;
-  color: #1db954;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.track a:hover {
-  text-decoration: underline;
-}
-
-/* Logout button style */
-#logout-button {
-  display: block;
-  margin: 30px auto;
-  padding: 10px 20px;
-  background-color: #ff3b3b;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-}
-
-#logout-button:hover {
-  background-color: #ff5e5e;
-}
-
-/* Profile picture style */
-#profile-picture {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-top: 20px;
-}
+  .track p {
+    margin: 5px 0;
+  }
 </style>
 </head>
 <body>
 
 <h1>Spotify API Mood Search</h1>
 
-<div id="profile-picture"></div> <!-- Profile picture will be displayed here -->
+<!-- Profile picture with dropdown -->
+<div id="profile-picture">
+  <img src="" alt="Profile Picture" id="profile-image">
+  <div class="profile-dropdown">
+    <div class="profile-dropdown-item" onclick="logout()">Logout</div>
+  </div>
+</div>
 
+<!-- Search container -->
 <div class="search-container">
-  <select id="moods">
+  <select id="dropdown">
     <option value="0">Select a mood...</option>
     <option value="chill">Chill</option>
-    <option value="sad">Sad</option>
     <option value="happy">Happy</option>
+    <option value="sad">Sad</option>
   </select>
 
   <button onclick="searchSongs()">Search</button>
 </div>
 
-<div id="results-container">
-  <div id="results"></div>
-</div>
-
-<button id="logout-button">Logout</button>
+<!-- Results container -->
+<div id="results" class="results-container"></div>
 
 <script>
 $(document).ready(function() {
-  // Attach event listener to logout button
-  $("#logout-button").click(function() {
-    // Redirect to index.html
-    window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-  });
-
-  // Retrieve stored search results and selected mood from sessionStorage
-  const storedResults = sessionStorage.getItem('searchResults');
-  const selectedMood = sessionStorage.getItem('selectedMood');
-
-  if (storedResults && selectedMood) {
-    $('#moods').val(selectedMood);
-    $('#results').html(storedResults);
-  }
-
-  // Check if the access token is present in the URL hash
+  // Check if access token is present in URL hash
   var accessToken = getAccessTokenFromURL();
   if (accessToken) {
-    // If access token is present, fetch user's profile data
+    // Fetch user's profile data and display profile picture
     fetchSpotifyProfile(accessToken);
   }
 });
@@ -222,7 +164,7 @@ function fetchSpotifyProfile(accessToken) {
       'Authorization': 'Bearer ' + accessToken
     },
     success: function(response) {
-      // On success, display user's profile picture
+      // Display user's profile picture
       displayProfilePicture(response.images[0].url);
     },
     error: function(xhr, status, error) {
@@ -233,11 +175,15 @@ function fetchSpotifyProfile(accessToken) {
 
 function displayProfilePicture(profilePictureUrl) {
   // Display user's profile picture
-  var profilePictureDiv = document.getElementById('profile-picture');
-  profilePictureDiv.innerHTML = `<img src="${profilePictureUrl}" alt="Profile Picture">`;
+  var profilePictureImg = document.getElementById('profile-image');
+  profilePictureImg.src = profilePictureUrl;
 }
 
-// Function to extract access token from URL hash
+function logout() {
+  // Redirect to logout URL or perform logout action
+  window.location.href = "index.html"; // Replace with actual logout URL or action
+}
+
 function getAccessTokenFromURL() {
   var hash = window.location.hash.substring(1);
   var params = hash.split('&');
@@ -247,10 +193,76 @@ function getAccessTokenFromURL() {
       return param[1];
     }
   }
-  return null; // Access token not found in URL hash
+  return null;
+}
+
+function searchSongs() {
+  var selectedMood = $("#dropdown").val();
+  if (selectedMood == "0") {
+    alert("Please select a mood.");
+    return;
+  }
+
+  var accessToken = getAccessTokenFromURL();
+  if (!accessToken) {
+    alert("Access token not found. Please login again.");
+    return;
+  }
+
+  var playlistId;
+  switch (selectedMood) {
+    case 'chill':
+      playlistId = '37i9dQZF1DX889U0CL85jj'; // Chill playlist
+      break;
+    case 'happy':
+      playlistId = '37i9dQZF1DXdPec7aLTmlC'; // Happy playlist
+      break;
+    case 'sad':
+      playlistId = '37i9dQZF1DX7qK8ma5wgG1'; // Sad playlist
+      break;
+    default:
+      alert("Invalid mood selected.");
+      return;
+  }
+
+  $.ajax({
+    url: 'https://api.spotify.com/v1/playlists/' + playlistId + '/tracks',
+    type: 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + accessToken
+    },
+    success: function(response) {
+      displayResults(response.items);
+    },
+    error: function(xhr, status, error) {
+      console.error('Error fetching playlist tracks:', error);
+    }
+  });
+}
+
+function displayResults(tracks) {
+  var html = "<h2>Top Tracks</h2>";
+  for (var i = 0; i < tracks.length; i++) {
+    var track = tracks[i].track;
+    var trackName = track.name;
+    var trackId = track.id;
+    var artistName = track.artists[0].name;
+    var releaseYear = new Date(track.album.release_date).getFullYear();
+    var previewUrl = track.preview_url;
+    var spotifyUrl = "https://open.spotify.com/track/" + trackId;
+    html += "<div class='track'>";
+    html += '<p>' + trackName + ' by ' + artistName + ' (' + releaseYear + ')</p>';
+    if (previewUrl) {
+      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
+    } else {
+      html += "<p>(Preview not available)</p>";
+    }
+    html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
+    html += "</div>";
+  }
+  $("#results").html(html);
 }
 </script>
 
 </body>
 </html>
-
