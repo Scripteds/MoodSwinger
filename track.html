@@ -141,6 +141,16 @@
 <!-- Back button -->
 <button id="back-button">Back</button>
 
+<div class="search-container">
+  <select id="mood">
+    <option value="0">Select Mood...</option>
+    <option value="chill">Chill</option>
+    <option value="sad">Sad</option>
+    <option value="happy">Happy</option>
+  </select>
+  <button onclick="searchSongs()">Search</button>
+</div>
+
 <!-- Logout button -->
 <button id="logout-button">Logout</button>
 
@@ -171,6 +181,12 @@ $(document).ready(function() {
   $('#track-details').html(trackDetailsHtml);
 });
 
+function searchSongs() {
+  var selectedMood = $("#mood").val();
+  if (selectedMood == "0") {
+    alert("Please select a mood.");
+    return;
+  }
 
   // Define artists for each mood
   var artists = {
