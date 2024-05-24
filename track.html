@@ -148,7 +148,6 @@
     <option value="sad">Sad</option>
     <option value="happy">Happy</option>
   </select>
-  <button onclick="searchSongs()">Search</button>
 </div>
 
 <!-- Logout button -->
@@ -181,12 +180,6 @@ $(document).ready(function() {
   $('#track-details').html(trackDetailsHtml);
 });
 
-function searchSongs() {
-  var selectedMood = $("#mood").val();
-  if (selectedMood == "0") {
-    alert("Please select a mood.");
-    return;
-  }
 
   // Define artists for each mood
   var artists = {
@@ -249,30 +242,6 @@ function searchTopTracks(artistId, accessToken) {
 }
 
 
-function displayResults(data) {
-  var tracks = data.tracks;
-  var html = "<h2>Top 5 Tracks</h2>";
-  html += "<div class='tracks'>";
-  for (var i = 0; i < 5; i++) {
-    var trackName = tracks[i].name;
-    var trackId = tracks[i].id;
-    var artistName = tracks[i].artists[0].name; // Get the artist name
-    var releaseYear = new Date(tracks[i].album.release_date).getFullYear(); // Get the release year
-    var previewUrl = tracks[i].preview_url;
-    var spotifyUrl = "https://open.spotify.com/track/" + trackId;
-    html += "<div class='track'>";
-    html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
-    if (previewUrl) {
-      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
-    } else {
-      html += "<p>(Preview not available)</p>";
-    }
-    html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
-    html += "</div>";
-  }
-  html += "</div>";
-  $("#results").html(html);
-}
 
 function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
   sessionStorage.setItem('trackId', trackId);
