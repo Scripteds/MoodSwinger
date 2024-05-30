@@ -286,7 +286,7 @@ function displayResults(data) {
     var spotifyUrl = "https://open.spotify.com/track/" + trackId;
     if (previewUrl) {
       html += "<div class='track'>";
-      html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
+      html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="return saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
       html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
       html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
       html += "</div>";
@@ -305,6 +305,10 @@ function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
   sessionStorage.setItem('trackName', trackName);
   sessionStorage.setItem('artistName', artistName);
   sessionStorage.setItem('releaseYear', releaseYear);
+
+  // Redirect to track.html after saving the details
+  window.location.href = "https://scripteds.github.io/MoodSwinger/track.html";
+  return false; // Prevent default link behavior
 }
 </script>
 
