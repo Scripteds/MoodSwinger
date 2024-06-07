@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spotify API Mood Search</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://sdk.scdn.co/spotify-player.js"></script>
 <style>
 /* Body style */
 body {
@@ -192,8 +193,11 @@ button:hover {
 </div>
 <button id="logout-button">Logout</button>
 
-<script>
+  <script>
+    
 $(document).ready(function() {
+    var player;
+
     // Function to extract access token from URL parameter
     function getAccessToken() {
         const urlParams = new URLSearchParams(window.location.hash.substr(1));
@@ -226,6 +230,40 @@ $(document).ready(function() {
         localStorage.removeItem('accessToken');
         window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
+
+    // Initialize Spotify Player
+    window.onSpotifyWebPlaybackSDKReady = () => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            player = new Spotify.Player({
+                name: 'Web Playback SDK Quick Start Player',
+                getOAuthToken: cb => { cb(token); }
+            });
+
+            // Error handling
+            player.addListener('initialization_error', ({ message }) => { console.error(message); });
+            player.addListener('authentication_error', ({ message }) => { console.error(message); });
+            player.addListener('account_error', ({ message }) => { console.error(message); });
+            player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+            // Playback status updates
+            player.addListener('player_state_changed', state => {
+                console.log(state);
+            });
+
+            // Ready
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Ready with Device ID', device_id);
+            });
+
+            // Connect to the player!
+            player.connect().then(success => {
+                if (success) {
+                    console.log('The Web Playback SDK successfully connected to Spotify!');
+                }
+            });
+        }
+    };
 });
 
 function searchSongs() {
@@ -256,7 +294,7 @@ function searchRecommendedTracks(mood, accessToken) {
         success: function(response) {
             var trackHtml = '<h2>Recommended Tracks:</h2><ul>';
             response.tracks.slice(0, 5).forEach(function(track) { // Slice the array to get only 5 tracks
-                trackHtml += '<li>' + track.name + ' - ' + track.artists[0].name + '</li>';
+                trackHtml += '<li><button onclick="playTrack(\'' + track.uri + '\')">' + track.name + ' - ' + track.artists[0].name + '</button></li>';
             });
             trackHtml += '</ul>';
             $('#results').html(trackHtml);
@@ -267,6 +305,21 @@ function searchRecommendedTracks(mood, accessToken) {
     });
 }
 
+function playTrack(trackUri) {
+    player.getCurrentState().then(state => {
+        if (!state) {
+            console.error('User is not playing music through the Web Playback SDK');
+            return;
+        }
+
+        const play = {
+            uris: [trackUri],
+            position_ms: state.position
+        };
+
+        return player.play(play);
+    });
+}
 
 function displayPlaylist() {
     var accessToken = localStorage.getItem('accessToken');
@@ -288,7 +341,7 @@ function displayPlaylist() {
             playlists.forEach(function(playlist) {
                 playlistHtml += '<h3>' + playlist.name + '</h3><ul>';
                 playlist.tracks.items.forEach(function(item) {
-                    playlistHtml += '<li>' + item.track.name + ' - ' + item.track.artists[0].name + '</li>';
+                    playlistHtml += '<li><button onclick="playTrack(\'' + item.track.uri + '\')">' + item.track.name + ' - ' + item.track.artists[0].name + '</button></li>';
                 });
                 playlistHtml += '</ul>';
             });
@@ -300,6 +353,5 @@ function displayPlaylist() {
     });
 }
 </script>
-
 </body>
 </html>
