@@ -193,23 +193,23 @@ button:hover {
 <button id="logout-button">Logout</button>
 
 <script>
-$(document).ready(function() {
-    // Function to get access token from URL parameter
-    function getAccessToken() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('access_token');
-    }
+   $(document).ready(function() {
+        // Function to extract access token from URL parameter
+        function getAccessToken() {
+            const urlParams = new URLSearchParams(window.location.hash.substr(1));
+            return urlParams.get('access_token');
+        }
 
-    // Check if access token exists in URL
-    var accessToken = getAccessToken();
-    if (accessToken) {
-        // If access token exists, store it in localStorage
-        localStorage.setItem('accessToken', accessToken);
-    } else {
-        // If access token doesn't exist, redirect to index.html for login
-        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-    }
-
+        // Check if access token exists in URL
+        var accessToken = getAccessToken();
+        if (accessToken) {
+            // If access token exists, store it in localStorage
+            localStorage.setItem('accessToken', accessToken);
+        } else {
+            // If access token doesn't exist, redirect to index.html for login
+            window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+        }
+     
     const storedResults = sessionStorage.getItem('searchResults');
     const selectedMood = sessionStorage.getItem('selectedMood');
 
