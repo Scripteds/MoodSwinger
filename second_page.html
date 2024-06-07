@@ -233,12 +233,7 @@ function searchRecommendedTracks(mood, accessToken) {
             "Authorization": "Bearer " + accessToken
         },
         success: function(response) {
-            var trackHtml = '<h2>Recommended Tracks:</h2><div class="tracks">';
-            response.tracks.slice(0, 5).forEach(function(track) { // Slice the array to get only 5 tracks
-                trackHtml += '<div class="track"><p>' + track.name + '</p><p>' + track.artists.map(artist => artist.name).join(', ') + '</p><a href="#" onclick="playTrack(\'' + track.uri + '\')">Play</a></div>';
-            });
-            trackHtml += '</div>';
-            $('#results').html(trackHtml);
+            displayResults(response);
         },
         error: function(xhr, status, error) {
             console.log(error);
@@ -246,20 +241,38 @@ function searchRecommendedTracks(mood, accessToken) {
     });
 }
 
-function playTrack(trackUri) {
-    player.getCurrentState().then(state => {
-        if (!state) {
-            console.error('User is not playing music through the Web Playback SDK');
-            return;
+function displayResults(data) {
+    var tracks = data.tracks;
+    var html = "<h2>Recommended Tracks</h2>";
+    html += "<div class='tracks'>";
+    var count = 0;
+    for (var i = 0; i < tracks.length && count < 5; i++) {
+        var trackName = tracks[i].name;
+        var trackId = tracks[i].id;
+        var artistName = tracks[i].artists[0].name;
+        var releaseYear = new Date(tracks[i].album.release_date).getFullYear();
+        var previewUrl = tracks[i].preview_url;
+        var spotifyUrl = "https://open.spotify.com/track/" + trackId;
+        if (previewUrl) {
+            html += "<div class='track'>";
+            html += '<p>' + trackName + ' - ' + artistName + ' (' + releaseYear + ')</p>';
+            html += '<audio controls><source src="' + previewUrl + '" type="audio/mpeg">Your browser does not support the audio element.</audio>';
+            html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
+            html += '<button onclick="playTrack(\'' + previewUrl + '\')">Play</button>';
+            html += "</div>";
+            count++;
         }
+    }
+    html += "</div>";
+    $("#results").html(html);
 
-        const play = {
-            uris: [trackUri],
-            position_ms: state.position
-        };
+    // Store search results in sessionStorage
+    sessionStorage.setItem('searchResults', html);
+}
 
-        return player.play(play);
-    });
+function playTrack(previewUrl) {
+    var audio = new Audio(previewUrl);
+    audio.play();
 }
 
 function displayPlaylist() {
@@ -282,7 +295,7 @@ function displayPlaylist() {
             playlists.forEach(function(playlist) {
                 playlistHtml += '<h3>' + playlist.name + '</h3><div class="tracks">';
                 playlist.tracks.items.forEach(function(item) {
-                    playlistHtml += '<div class="track"><p>' + item.track.name + '</p><p>' + item.track.artists.map(artist => artist.name).join(', ') + '</p><a href="#" onclick="playTrack(\'' + item.track.uri + '\')">Play</a></div>';
+                    playlistHtml += '<div class="track"><p>' + item.track.name + ' - ' + item.track.artists.map(artist => artist.name).join(', ') + '</p><a href="#" onclick="playTrack(\'' + item.track.preview_url + '\')">Play</a></div>';
                 });
                 playlistHtml += '</div>';
             });
