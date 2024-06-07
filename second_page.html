@@ -206,8 +206,17 @@ $(document).ready(function() {
   displayPlaylist();
 
   $("#logout-button").click(function() {
+    // Clear access token and redirect to login page
+    localStorage.removeItem('accessToken');
     window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
   });
+
+  // Check if access token exists
+  var accessToken = localStorage.getItem('accessToken');
+  if (accessToken) {
+    // If access token exists, set it for further requests
+    sessionStorage.setItem('accessToken', accessToken);
+  }
 });
 
 function searchSongs() {
@@ -217,10 +226,9 @@ function searchSongs() {
     return;
   }
 
-  sessionStorage.setItem('selectedMood', selectedMood);
   var accessToken = sessionStorage.getItem('accessToken');
   if (!accessToken) {
-    alert("Please login to Spotify."); // This should not occur if user is already logged in
+    alert("Please login to Spotify.");
     return;
   }
 
@@ -253,7 +261,7 @@ function searchRecommendedTracks(mood, accessToken) {
 function displayPlaylist() {
   var accessToken = sessionStorage.getItem('accessToken');
   if (!accessToken) {
-    alert("Please login to Spotify."); // This should not occur if user is already logged in
+    alert("Please login to Spotify.");
     return;
   }
 
