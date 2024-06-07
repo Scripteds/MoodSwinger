@@ -195,18 +195,15 @@ button:hover {
 
 <script>
 $(document).ready(function() {
-  // Attach event listener to logout button
+  const code = getParameterByName('code');
+  if (code) {
+    getAccessToken(code);
+  }
+
   $("#logout-button").click(function() {
-    // Redirect to index.html
     window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
   });
 
-  // Attach event listener to login button
-  $("#login-button").click(function() {
-    redirectToSpotifyLogin();
-  });
-
-  // Retrieve stored search results and selected mood from sessionStorage
   const storedResults = sessionStorage.getItem('searchResults');
   const selectedMood = sessionStorage.getItem('selectedMood');
 
@@ -214,23 +211,7 @@ $(document).ready(function() {
     $('#moods').val(selectedMood);
     $('#results').html(storedResults);
   }
-
-  // Handle the redirect from Spotify authorization
-  const code = getParameterByName('code');
-  if (code) {
-    getAccessToken(code);
-  }
 });
-
-function redirectToSpotifyLogin() {
-  const clientId = 'a80fcf0c3aae4aabb6f6b6721183b72e';
-  const redirectUri = 'https://scripteds.github.io/MoodSwinger'; // Replace with your redirect URI
-  const scopes = 'playlist-modify-public user-read-private user-read-email';
-
-  const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
-
-  window.location.href = authUrl;
-}
 
 function getParameterByName(name) {
   const url = window.location.href;
@@ -247,7 +228,7 @@ function getParameterByName(name) {
 function getAccessToken(code) {
   const clientId = 'a80fcf0c3aae4aabb6f6b6721183b72e';
   const clientSecret = 'd786a136f1714d3f98a1adeb0a5f6c09';
-  const redirectUri = 'https://scripteds.github.io/MoodSwinger'; // Replace with your redirect URI
+  const redirectUri = 'https://scripteds.github.io/MoodSwinger/second_page.html';
 
   $.ajax({
     url: 'https://accounts.spotify.com/api/token',
@@ -280,10 +261,7 @@ function searchSongs() {
     return;
   }
 
-  // Store selected mood in sessionStorage
   sessionStorage.setItem('selectedMood', selectedMood);
-
-  // Use the access token from session storage
   var accessToken = sessionStorage.getItem('accessToken');
   if (!accessToken) {
     alert("Please login to Spotify.");
@@ -335,10 +313,7 @@ function displayResults(data, accessToken) {
   html += "</div>";
   $("#results").html(html);
 
-  // Store search results in sessionStorage
   sessionStorage.setItem('searchResults', html);
-
-  // Create playlist and add tracks
   createPlaylistAndAddTracks(trackUris, accessToken);
 }
 
@@ -401,7 +376,7 @@ function playPlaylist(playlistId, accessToken) {
     });
 
     player.addListener('initialization_error', ({ message }) => { console.error(message); });
-    player.addListener('authentication_error', ({ message }) => { console.error(message); });
+    player.addListener('authentication_error', ({ message }) => { console.error(message);
     player.addListener('account_error', ({ message }) => { console.error(message); });
     player.addListener('playback_error', ({ message }) => { console.error(message); });
 
@@ -441,7 +416,6 @@ function playPlaylist(playlistId, accessToken) {
     player.connect();
   };
 }
-
 </script>
 
 
