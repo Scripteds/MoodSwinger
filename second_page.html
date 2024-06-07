@@ -255,7 +255,7 @@ function searchRecommendedTracks(mood, accessToken) {
         },
         success: function(response) {
             var trackHtml = '<h2>Recommended Tracks:</h2><ul>';
-            response.tracks.forEach(function(track) {
+            response.tracks.slice(0, 5).forEach(function(track) { // Slice the array to get only 5 tracks
                 trackHtml += '<li>' + track.name + ' - ' + track.artists[0].name + '</li>';
             });
             trackHtml += '</ul>';
@@ -266,6 +266,7 @@ function searchRecommendedTracks(mood, accessToken) {
         }
     });
 }
+
 
 function displayPlaylist() {
     var accessToken = localStorage.getItem('accessToken');
