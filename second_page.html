@@ -194,15 +194,6 @@ button:hover {
 
 <script>
 $(document).ready(function() {
-  const code = getParameterByName('code');
-  if (code) {
-    getAccessToken(code);
-  }
-
-  $("#logout-button").click(function() {
-    window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-  });
-
   const storedResults = sessionStorage.getItem('searchResults');
   const selectedMood = sessionStorage.getItem('selectedMood');
 
@@ -213,23 +204,11 @@ $(document).ready(function() {
 
   // Call function to display playlist
   displayPlaylist();
+
+  $("#logout-button").click(function() {
+    window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+  });
 });
-
-function getParameterByName(name) {
-  const url = window.location.href;
-  const nameRegex = name.replace(/[\[\]]/g, '\\$&');
-  const regex = new RegExp(`[?&]${nameRegex}(=([^&#]*)|&|#|$)`);
-  const results = regex.exec(url);
-
-  if (!results) return null;
-  if (!results[2]) return '';
-
-  return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
-
-function getAccessToken(code) {
-  // Your getAccessToken function
-}
 
 function searchSongs() {
   var selectedMood = $("#moods").val();
@@ -241,7 +220,7 @@ function searchSongs() {
   sessionStorage.setItem('selectedMood', selectedMood);
   var accessToken = sessionStorage.getItem('accessToken');
   if (!accessToken) {
-    alert("Please login to Spotify.");
+    alert("Please login to Spotify."); // This should not occur if user is already logged in
     return;
   }
 
@@ -274,7 +253,7 @@ function searchRecommendedTracks(mood, accessToken) {
 function displayPlaylist() {
   var accessToken = sessionStorage.getItem('accessToken');
   if (!accessToken) {
-    alert("Please login to Spotify.");
+    alert("Please login to Spotify."); // This should not occur if user is already logged in
     return;
   }
 
