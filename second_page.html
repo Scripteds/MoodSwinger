@@ -228,32 +228,7 @@ function getParameterByName(name) {
 }
 
 function getAccessToken(code) {
-  const clientId = 'a80fcf0c3aae4aabb6f6b6721183b72e';
-  const clientSecret = 'd786a136f1714d3f98a1adeb0a5f6c09';
-  const redirectUri = 'https://scripteds.github.io/MoodSwinger/second_page.html';
-
-  $.ajax({
-    url: 'https://accounts.spotify.com/api/token',
-    type: 'POST',
-    headers: {
-      'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
-    },
-    data: {
-      grant_type: 'authorization_code',
-      code: code,
-      redirect_uri: redirectUri
-    },
-    success: function(response) {
-      const accessToken = response.access_token;
-      const refreshToken = response.refresh_token;
-
-      sessionStorage.setItem('accessToken', accessToken);
-      sessionStorage.setItem('refreshToken', refreshToken);
-    },
-    error: function(xhr, status, error) {
-      console.log(error);
-    }
-  });
+  // Your getAccessToken function
 }
 
 function searchSongs() {
@@ -270,36 +245,10 @@ function searchSongs() {
     return;
   }
 
-  createPlaylistAndRecommendTracks(selectedMood, accessToken);
+  searchRecommendedTracks(selectedMood, accessToken);
 }
 
-function createPlaylistAndRecommendTracks(mood, accessToken) {
-  var apiUrl = "https://api.spotify.com/v1/me";
-  var playlistName = "Mood Playlist - " + mood; // Adjust playlist name
-
-  // Create playlist
-  $.ajax({
-    url: apiUrl + "/playlists",
-    type: "POST",
-    headers: {
-      "Authorization": "Bearer " + accessToken,
-      "Content-Type": "application/json"
-    },
-    data: JSON.stringify({
-      name: playlistName,
-      public: true
-    }),
-    success: function(playlistResponse) {
-      var playlistId = playlistResponse.id;
-      searchRecommendedTracks(mood, accessToken, playlistId);
-    },
-    error: function(xhr, status, error) {
-      console.log("Error creating playlist:", error);
-    }
-  });
-}
-
-function searchRecommendedTracks(mood, accessToken, playlistId) {
+function searchRecommendedTracks(mood, accessToken) {
   var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
 
   $.ajax({
@@ -309,32 +258,15 @@ function searchRecommendedTracks(mood, accessToken, playlistId) {
       "Authorization": "Bearer " + accessToken
     },
     success: function(response) {
-      var trackUris = response.tracks.map(track => track.uri);
-      addTracksToPlaylist(playlistId, trackUris, accessToken);
+      var trackHtml = '<h2>Recommended Tracks:</h2><ul>';
+      response.tracks.forEach(function(track) {
+        trackHtml += '<li>' + track.name + ' - ' + track.artists[0].name + '</li>';
+      });
+      trackHtml += '</ul>';
+      $('#results').html(trackHtml);
     },
     error: function(xhr, status, error) {
       console.log(error);
-    }
-  });
-}
-
-function addTracksToPlaylist(playlistId, trackUris, accessToken) {
-  $.ajax({
-    url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-    type: "POST",
-    headers: {
-      "Authorization": "Bearer " + accessToken,
-      "Content-Type": "application/json"
-    },
-    data: JSON.stringify({
-      uris: trackUris
-    }),
-    success: function() {
-      console.log("Tracks added to playlist successfully!");
-      alert("Playlist created and tracks added successfully!");
-    },
-    error: function(xhr, status, error) {
-      console.log("Error adding tracks to playlist:", error);
     }
   });
 }
@@ -346,7 +278,7 @@ function displayPlaylist() {
     return;
   }
 
-  // Retrieve playlist
+  // Retrieve playlists
   $.ajax({
     url: 'https://api.spotify.com/v1/me/playlists',
     type: 'GET',
@@ -355,12 +287,15 @@ function displayPlaylist() {
     },
     success: function(response) {
       var playlists = response.items;
-      var playlistHtml = '<h2>Your Playlists:</h2><ul>';
+      var playlistHtml = '<h2>Your Playlists:</h2>';
       playlists.forEach(function(playlist) {
-        playlistHtml += '<li><a href="' + playlist.external_urls.spotify + '">' + playlist.name + '</a></li>';
+        playlistHtml += '<h3>' + playlist.name + '</h3><ul>';
+        playlist.tracks.items.forEach(function(item) {
+          playlistHtml += '<li>' + item.track.name + ' - ' + item.track.artists[0].name + '</li>';
+        });
+        playlistHtml += '</ul>';
       });
-      playlistHtml += '</ul>';
-      $('#results').html(playlistHtml);
+      $('#results').append(playlistHtml);
     },
     error: function(xhr, status, error) {
       console.log(error);
