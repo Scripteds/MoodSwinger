@@ -178,7 +178,7 @@ button:hover {
 <body>
 
 <h1>Spotify API Mood Search</h1>
-  <div class="search-container">
+<div class="search-container">
     <select id="moods">
       <option value="0">Select a mood...</option>
       <option value="chill">Chill</option>
@@ -186,12 +186,11 @@ button:hover {
       <option value="happy">Happy</option>
     </select>
     <button onclick="searchSongs()">Search</button>
-  </div>
-  <div id="results-container">
+</div>
+<div id="results-container">
     <div id="results"></div>
-  </div>
-  <button id="logout-button">Logout</button>
-  <button id="login-button">Login to Spotify</button>
+</div>
+<button id="logout-button">Logout</button>
 
 <script>
 $(document).ready(function() {
@@ -416,8 +415,8 @@ function playPlaylist(playlistId, accessToken) {
     player.connect();
   };
 }
-</script>
 
+</script>
 
 </body>
 </html>
