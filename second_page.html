@@ -338,34 +338,42 @@ function createPlaylistAndAddTracks(trackUris, accessToken) {
         }),
         success: function(playlistResponse) {
           var playlistId = playlistResponse.id;
-          $.ajax({
-            url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-            type: "POST",
-            headers: {
-              "Authorization": "Bearer " + accessToken,
-              "Content-Type": "application/json"
-            },
-            data: JSON.stringify({
-              uris: trackUris
-            }),
-            success: function() {
-              playPlaylist(playlistId, accessToken);
-            },
-            error: function(xhr, status, error) {
-              console.log(error);
-            }
-          });
+          // Add tracks to the created playlist
+          addTracksToPlaylist(playlistId, trackUris, accessToken);
         },
         error: function(xhr, status, error) {
-          console.log(error);
+          console.log("Error creating playlist:", error);
         }
       });
     },
     error: function(xhr, status, error) {
-      console.log(error);
+      console.log("Error fetching user info:", error);
     }
   });
 }
+
+function addTracksToPlaylist(playlistId, trackUris, accessToken) {
+  $.ajax({
+    url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+    type: "POST",
+    headers: {
+      "Authorization": "Bearer " + accessToken,
+      "Content-Type": "application/json"
+    },
+    data: JSON.stringify({
+      uris: trackUris
+    }),
+    success: function() {
+      console.log("Tracks added to playlist successfully!");
+      // After adding tracks, play the playlist
+      playPlaylist(playlistId, accessToken);
+    },
+    error: function(xhr, status, error) {
+      console.log("Error adding tracks to playlist:", error);
+    }
+  });
+}
+
 
 function playPlaylist(playlistId, accessToken) {
   window.onSpotifyWebPlaybackSDKReady = () => {
