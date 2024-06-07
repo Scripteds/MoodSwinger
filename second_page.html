@@ -210,6 +210,9 @@ $(document).ready(function() {
     $('#moods').val(selectedMood);
     $('#results').html(storedResults);
   }
+
+  // Call function to display playlist
+  displayPlaylist();
 });
 
 function getParameterByName(name) {
@@ -332,6 +335,35 @@ function addTracksToPlaylist(playlistId, trackUris, accessToken) {
     },
     error: function(xhr, status, error) {
       console.log("Error adding tracks to playlist:", error);
+    }
+  });
+}
+
+function displayPlaylist() {
+  var accessToken = sessionStorage.getItem('accessToken');
+  if (!accessToken) {
+    alert("Please login to Spotify.");
+    return;
+  }
+
+  // Retrieve playlist
+  $.ajax({
+    url: 'https://api.spotify.com/v1/me/playlists',
+    type: 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + accessToken
+    },
+    success: function(response) {
+      var playlists = response.items;
+      var playlistHtml = '<h2>Your Playlists:</h2><ul>';
+      playlists.forEach(function(playlist) {
+        playlistHtml += '<li><a href="' + playlist.external_urls.spotify + '">' + playlist.name + '</a></li>';
+      });
+      playlistHtml += '</ul>';
+      $('#results').html(playlistHtml);
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
     }
   });
 }
