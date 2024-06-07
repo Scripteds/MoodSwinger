@@ -178,23 +178,20 @@ button:hover {
 <body>
 
 <h1>Spotify API Mood Search</h1>
-
-<div class="search-container">
-  <select id="moods">
-    <option value="0">Select a mood...</option>
-    <option value="chill">Chill</option>
-    <option value="sad">Sad</option>
-    <option value="happy">Happy</option>
-  </select>
-
-  <button onclick="searchSongs()">Search</button>
-</div>
-
-<div id="results-container">
-  <div id="results"></div>
-</div>
-
-<button id="logout-button">Logout</button>
+  <div class="search-container">
+    <select id="moods">
+      <option value="0">Select a mood...</option>
+      <option value="chill">Chill</option>
+      <option value="sad">Sad</option>
+      <option value="happy">Happy</option>
+    </select>
+    <button onclick="searchSongs()">Search</button>
+  </div>
+  <div id="results-container">
+    <div id="results"></div>
+  </div>
+  <button id="logout-button">Logout</button>
+  <button id="login-button">Login to Spotify</button>
 
 <script>
 $(document).ready(function() {
@@ -202,6 +199,11 @@ $(document).ready(function() {
   $("#logout-button").click(function() {
     // Redirect to index.html
     window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+  });
+
+  // Attach event listener to login button
+  $("#login-button").click(function() {
+    redirectToSpotifyLogin();
   });
 
   // Retrieve stored search results and selected mood from sessionStorage
@@ -212,7 +214,64 @@ $(document).ready(function() {
     $('#moods').val(selectedMood);
     $('#results').html(storedResults);
   }
+
+  // Handle the redirect from Spotify authorization
+  const code = getParameterByName('code');
+  if (code) {
+    getAccessToken(code);
+  }
 });
+
+function redirectToSpotifyLogin() {
+  const clientId = 'a80fcf0c3aae4aabb6f6b6721183b72e';
+  const redirectUri = 'https://scripteds.github.io/MoodSwinger'; // Replace with your redirect URI
+  const scopes = 'playlist-modify-public user-read-private user-read-email';
+
+  const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
+
+  window.location.href = authUrl;
+}
+
+function getParameterByName(name) {
+  const url = window.location.href;
+  const nameRegex = name.replace(/[\[\]]/g, '\\$&');
+  const regex = new RegExp(`[?&]${nameRegex}(=([^&#]*)|&|#|$)`);
+  const results = regex.exec(url);
+
+  if (!results) return null;
+  if (!results[2]) return '';
+
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+function getAccessToken(code) {
+  const clientId = 'a80fcf0c3aae4aabb6f6b6721183b72e';
+  const clientSecret = 'd786a136f1714d3f98a1adeb0a5f6c09';
+  const redirectUri = 'https://scripteds.github.io/MoodSwinger'; // Replace with your redirect URI
+
+  $.ajax({
+    url: 'https://accounts.spotify.com/api/token',
+    type: 'POST',
+    headers: {
+      'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
+    },
+    data: {
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: redirectUri
+    },
+    success: function(response) {
+      const accessToken = response.access_token;
+      const refreshToken = response.refresh_token;
+
+      sessionStorage.setItem('accessToken', accessToken);
+      sessionStorage.setItem('refreshToken', refreshToken);
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
+    }
+  });
+}
 
 function searchSongs() {
   var selectedMood = $("#moods").val();
@@ -224,38 +283,18 @@ function searchSongs() {
   // Store selected mood in sessionStorage
   sessionStorage.setItem('selectedMood', selectedMood);
 
-  // Client ID and Client Secret
-  var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
-  var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
+  // Use the access token from session storage
+  var accessToken = sessionStorage.getItem('accessToken');
+  if (!accessToken) {
+    alert("Please login to Spotify.");
+    return;
+  }
 
-  // Request access token
-  $.ajax({
-    url: "https://accounts.spotify.com/api/token",
-    type: "POST",
-    headers: {
-      "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
-    },
-    data: {
-      "grant_type": "client_credentials"
-    },
-    success: function(response) {
-      var accessToken = response.access_token;
-      searchRecommendedTracks(selectedMood, accessToken);
-    },
-    error: function(xhr, status, error) {
-      console.log(error);
-    }
-  });
+  searchRecommendedTracks(selectedMood, accessToken);
 }
 
 function searchRecommendedTracks(mood, accessToken) {
-  // Use Spotify's recommendation API to get recommended tracks based on mood
   var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
-
-  if (!accessToken) {
-    console.log("Access token not available.");
-    return;
-  }
 
   $.ajax({
     url: apiUrl,
@@ -304,7 +343,6 @@ function displayResults(data, accessToken) {
 }
 
 function createPlaylistAndAddTracks(trackUris, accessToken) {
-  // Get user ID
   $.ajax({
     url: "https://api.spotify.com/v1/me",
     type: "GET",
@@ -313,7 +351,6 @@ function createPlaylistAndAddTracks(trackUris, accessToken) {
     },
     success: function(response) {
       var userId = response.id;
-      // Create playlist
       $.ajax({
         url: `https://api.spotify.com/v1/users/${userId}/playlists`,
         type: "POST",
@@ -327,7 +364,6 @@ function createPlaylistAndAddTracks(trackUris, accessToken) {
         }),
         success: function(playlistResponse) {
           var playlistId = playlistResponse.id;
-          // Add tracks to playlist
           $.ajax({
             url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
             type: "POST",
@@ -339,7 +375,6 @@ function createPlaylistAndAddTracks(trackUris, accessToken) {
               uris: trackUris
             }),
             success: function() {
-              // Play the playlist
               playPlaylist(playlistId, accessToken);
             },
             error: function(xhr, status, error) {
@@ -365,20 +400,16 @@ function playPlaylist(playlistId, accessToken) {
       getOAuthToken: cb => { cb(accessToken); }
     });
 
-    // Error handling
     player.addListener('initialization_error', ({ message }) => { console.error(message); });
     player.addListener('authentication_error', ({ message }) => { console.error(message); });
     player.addListener('account_error', ({ message }) => { console.error(message); });
     player.addListener('playback_error', ({ message }) => { console.error(message); });
 
-    // Playback status updates
     player.addListener('player_state_changed', state => { console.log(state); });
 
-    // Ready
     player.addListener('ready', ({ device_id }) => {
       console.log('Ready with Device ID', device_id);
 
-      // Transfer playback to the Web Playback SDK
       fetch('https://api.spotify.com/v1/me/player', {
         method: 'PUT',
         headers: {
@@ -391,7 +422,6 @@ function playPlaylist(playlistId, accessToken) {
         })
       });
 
-      // Start playback
       fetch(`https://api.spotify.com/v1/me/player/play`, {
         method: 'PUT',
         headers: {
@@ -404,7 +434,6 @@ function playPlaylist(playlistId, accessToken) {
       });
     });
 
-    // Not Ready
     player.addListener('not_ready', ({ device_id }) => {
       console.log('Device ID has gone offline', device_id);
     });
