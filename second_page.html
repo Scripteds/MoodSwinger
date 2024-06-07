@@ -317,6 +317,7 @@ function displayResults(data, accessToken) {
 }
 
 function createPlaylistAndAddTracks(trackUris, accessToken) {
+  console.log("Creating playlist...");
   $.ajax({
     url: "https://api.spotify.com/v1/me",
     type: "GET",
@@ -324,6 +325,7 @@ function createPlaylistAndAddTracks(trackUris, accessToken) {
       "Authorization": "Bearer " + accessToken
     },
     success: function(response) {
+      console.log("User info retrieved successfully:", response);
       var userId = response.id;
       $.ajax({
         url: `https://api.spotify.com/v1/users/${userId}/playlists`,
@@ -337,6 +339,7 @@ function createPlaylistAndAddTracks(trackUris, accessToken) {
           public: true
         }),
         success: function(playlistResponse) {
+          console.log("Playlist created successfully:", playlistResponse);
           var playlistId = playlistResponse.id;
           // Add tracks to the created playlist
           addTracksToPlaylist(playlistId, trackUris, accessToken);
