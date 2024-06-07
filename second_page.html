@@ -180,10 +180,10 @@ button:hover {
 <h1>Spotify API Mood Search</h1>
 <div class="search-container">
     <select id="moods">
-      <option value="0">Select a mood...</option>
-      <option value="chill">Chill</option>
-      <option value="sad">Sad</option>
-      <option value="happy">Happy</option>
+        <option value="0">Select a mood...</option>
+        <option value="chill">Chill</option>
+        <option value="sad">Sad</option>
+        <option value="happy">Happy</option>
     </select>
     <button onclick="searchSongs()">Search</button>
 </div>
@@ -194,100 +194,109 @@ button:hover {
 
 <script>
 $(document).ready(function() {
-  const storedResults = sessionStorage.getItem('searchResults');
-  const selectedMood = sessionStorage.getItem('selectedMood');
+    // Function to get access token from URL parameter
+    function getAccessToken() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('access_token');
+    }
 
-  if (storedResults && selectedMood) {
-    $('#moods').val(selectedMood);
-    $('#results').html(storedResults);
-  }
+    // Check if access token exists in URL
+    var accessToken = getAccessToken();
+    if (accessToken) {
+        // If access token exists, store it in localStorage
+        localStorage.setItem('accessToken', accessToken);
+    } else {
+        // If access token doesn't exist, redirect to index.html for login
+        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+    }
 
-  // Call function to display playlist
-  displayPlaylist();
+    const storedResults = sessionStorage.getItem('searchResults');
+    const selectedMood = sessionStorage.getItem('selectedMood');
 
-  $("#logout-button").click(function() {
-    // Clear access token and redirect to login page
-    localStorage.removeItem('accessToken');
-    window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-  });
+    if (storedResults && selectedMood) {
+        $('#moods').val(selectedMood);
+        $('#results').html(storedResults);
+    }
 
-  // Check if access token exists
-  var accessToken = localStorage.getItem('accessToken');
-  if (accessToken) {
-    // If access token exists, set it for further requests
-    sessionStorage.setItem('accessToken', accessToken);
-  }
+    // Call function to display playlist
+    displayPlaylist();
+
+    $("#logout-button").click(function() {
+        // Clear access token and redirect to login page
+        localStorage.removeItem('accessToken');
+        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+    });
 });
 
 function searchSongs() {
-  var selectedMood = $("#moods").val();
-  if (selectedMood == "0") {
-    alert("Please select a mood.");
-    return;
-  }
+    var selectedMood = $("#moods").val();
+    if (selectedMood == "0") {
+        alert("Please select a mood.");
+        return;
+    }
 
-  var accessToken = sessionStorage.getItem('accessToken');
-  if (!accessToken) {
-    alert("Please login to Spotify.");
-    return;
-  }
+    var accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+        alert("Please login to Spotify.");
+        return;
+    }
 
-  searchRecommendedTracks(selectedMood, accessToken);
+    searchRecommendedTracks(selectedMood, accessToken);
 }
 
 function searchRecommendedTracks(mood, accessToken) {
-  var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
+    var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
 
-  $.ajax({
-    url: apiUrl,
-    type: "GET",
-    headers: {
-      "Authorization": "Bearer " + accessToken
-    },
-    success: function(response) {
-      var trackHtml = '<h2>Recommended Tracks:</h2><ul>';
-      response.tracks.forEach(function(track) {
-        trackHtml += '<li>' + track.name + ' - ' + track.artists[0].name + '</li>';
-      });
-      trackHtml += '</ul>';
-      $('#results').html(trackHtml);
-    },
-    error: function(xhr, status, error) {
-      console.log(error);
-    }
-  });
+    $.ajax({
+        url: apiUrl,
+        type: "GET",
+        headers: {
+            "Authorization": "Bearer " + accessToken
+        },
+        success: function(response) {
+            var trackHtml = '<h2>Recommended Tracks:</h2><ul>';
+            response.tracks.forEach(function(track) {
+                trackHtml += '<li>' + track.name + ' - ' + track.artists[0].name + '</li>';
+            });
+            trackHtml += '</ul>';
+            $('#results').html(trackHtml);
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+        }
+    });
 }
 
 function displayPlaylist() {
-  var accessToken = sessionStorage.getItem('accessToken');
-  if (!accessToken) {
-    alert("Please login to Spotify.");
-    return;
-  }
-
-  // Retrieve playlists
-  $.ajax({
-    url: 'https://api.spotify.com/v1/me/playlists',
-    type: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + accessToken
-    },
-    success: function(response) {
-      var playlists = response.items;
-      var playlistHtml = '<h2>Your Playlists:</h2>';
-      playlists.forEach(function(playlist) {
-        playlistHtml += '<h3>' + playlist.name + '</h3><ul>';
-        playlist.tracks.items.forEach(function(item) {
-          playlistHtml += '<li>' + item.track.name + ' - ' + item.track.artists[0].name + '</li>';
-        });
-        playlistHtml += '</ul>';
-      });
-      $('#results').append(playlistHtml);
-    },
-    error: function(xhr, status, error) {
-      console.log(error);
+    var accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) {
+        alert("Please login to Spotify.");
+        return;
     }
-  });
+
+    // Retrieve playlists
+    $.ajax({
+        url: 'https://api.spotify.com/v1/me/playlists',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + accessToken
+        },
+        success: function(response) {
+            var playlists = response.items;
+            var playlistHtml = '<h2>Your Playlists:</h2>';
+            playlists.forEach(function(playlist) {
+                playlistHtml += '<h3>' + playlist.name + '</h3><ul>';
+                playlist.tracks.items.forEach(function(item) {
+                    playlistHtml += '<li>' + item.track.name + ' - ' + item.track.artists[0].name + '</li>';
+                });
+                playlistHtml += '</ul>';
+            });
+            $('#results').append(playlistHtml);
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+        }
+    });
 }
 </script>
 
