@@ -5,56 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoodSwinger</title>
     <style>
-        /* Body style */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-
-        /* Container style */
-        .container {
-            text-align: center;
-        }
-
-        /* Heading style */
-        h2 {
-            color: #333;
-        }
-
-        /* Paragraph style */
-        p {
-            color: #666;
-        }
-
-        /* Select dropdown style */
-        #dropdown {
-            background-color: #f2f2f2;
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            width: 200px;
-            margin-bottom: 10px;
-        }
-
-        /* Login button style */
-        .spotify-login-btn {
-            background-color: #1db954;
-            color: #fff;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .spotify-login-btn:hover {
-            background-color: #1ed760;
-        }
+        /* Styles go here */
     </style>
 </head>
 <body>
@@ -69,7 +20,7 @@
             <option value="playlist5">Playlist 5</option>
         </select>
         <br><br>
-        <a href="https://accounts.spotify.com/authorize?client_id=a80fcf0c3aae4aabb6f6b6721183b72e&response_type=code&redirect_uri=https://scripteds.github.io/MoodSwinger/second_page.html&scope=user-read-private%20user-read-email&state=STATE&show_dialog=true" class="spotify-login-btn">Login with Spotify</a>
+        <a href="https://accounts.spotify.com/authorize?client_id=a80fcf0c3aae4aabb6f6b6721183b72e&response_type=code&redirect_uri=https://scripteds.github.io/MoodSwinger/second_page.html&scope=user-read-private%20user-read-email%20playlist-modify-public&state=STATE&show_dialog=true" class="spotify-login-btn">Login with Spotify</a>
     </div>
 
     <script>
@@ -77,30 +28,6 @@
         function enableDropdown() {
             var dropdown = document.getElementById("dropdown");
             dropdown.disabled = false;
-        }
-
-        // Check if the URL contains an access token
-        window.addEventListener("load", function() {
-            var accessToken = getAccessTokenFromURL();
-            if (accessToken) {
-                // If access token is present, redirect to the second page
-                window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html";;
-            }
-        });
-
-        // Function to extract access token from URL
-        function getAccessTokenFromURL() {
-            var accessToken = null;
-            var hash = window.location.hash.substring(1);
-            var params = hash.split('&');
-            for (var i = 0; i < params.length; i++) {
-                var param = params[i].split('=');
-                if (param[0] === 'access_token') {
-                    accessToken = param[1];
-                    break;
-                }
-            }
-            return accessToken;
         }
     </script>
 </body>
