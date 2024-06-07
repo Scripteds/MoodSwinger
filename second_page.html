@@ -267,10 +267,36 @@ function searchSongs() {
     return;
   }
 
-  searchRecommendedTracks(selectedMood, accessToken);
+  createPlaylistAndRecommendTracks(selectedMood, accessToken);
 }
 
-function searchRecommendedTracks(mood, accessToken) {
+function createPlaylistAndRecommendTracks(mood, accessToken) {
+  var apiUrl = "https://api.spotify.com/v1/me";
+  var playlistName = "Mood Playlist - " + mood; // Adjust playlist name
+
+  // Create playlist
+  $.ajax({
+    url: apiUrl + "/playlists",
+    type: "POST",
+    headers: {
+      "Authorization": "Bearer " + accessToken,
+      "Content-Type": "application/json"
+    },
+    data: JSON.stringify({
+      name: playlistName,
+      public: true
+    }),
+    success: function(playlistResponse) {
+      var playlistId = playlistResponse.id;
+      searchRecommendedTracks(mood, accessToken, playlistId);
+    },
+    error: function(xhr, status, error) {
+      console.log("Error creating playlist:", error);
+    }
+  });
+}
+
+function searchRecommendedTracks(mood, accessToken, playlistId) {
   var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
 
   $.ajax({
@@ -280,77 +306,11 @@ function searchRecommendedTracks(mood, accessToken) {
       "Authorization": "Bearer " + accessToken
     },
     success: function(response) {
-      displayResults(response, accessToken);
+      var trackUris = response.tracks.map(track => track.uri);
+      addTracksToPlaylist(playlistId, trackUris, accessToken);
     },
     error: function(xhr, status, error) {
       console.log(error);
-    }
-  });
-}
-
-function displayResults(data, accessToken) {
-  var tracks = data.tracks;
-  var html = "<h2>Recommended Tracks</h2>";
-  html += "<div class='tracks'>";
-  var trackUris = [];
-  for (var i = 0; i < tracks.length; i++) {
-    var trackName = tracks[i].name;
-    var trackId = tracks[i].id;
-    var artistName = tracks[i].artists[0].name;
-    var releaseYear = new Date(tracks[i].album.release_date).getFullYear();
-    var previewUrl = tracks[i].preview_url;
-    var spotifyUrl = "https://open.spotify.com/track/" + trackId;
-    if (previewUrl) {
-      trackUris.push('spotify:track:' + trackId);
-      html += "<div class='track'>";
-      html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
-      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
-      html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
-      html += "</div>";
-    }
-  }
-  html += "</div>";
-  $("#results").html(html);
-
-  sessionStorage.setItem('searchResults', html);
-  createPlaylistAndAddTracks(trackUris, accessToken);
-}
-
-function createPlaylistAndAddTracks(trackUris, accessToken) {
-  console.log("Creating playlist...");
-  $.ajax({
-    url: "https://api.spotify.com/v1/me",
-    type: "GET",
-    headers: {
-      "Authorization": "Bearer " + accessToken
-    },
-    success: function(response) {
-      console.log("User info retrieved successfully:", response);
-      var userId = response.id;
-      $.ajax({
-        url: `https://api.spotify.com/v1/users/${userId}/playlists`,
-        type: "POST",
-        headers: {
-          "Authorization": "Bearer " + accessToken,
-          "Content-Type": "application/json"
-        },
-        data: JSON.stringify({
-          name: 'My Mood Playlist',
-          public: true
-        }),
-        success: function(playlistResponse) {
-          console.log("Playlist created successfully:", playlistResponse);
-          var playlistId = playlistResponse.id;
-          // Add tracks to the created playlist
-          addTracksToPlaylist(playlistId, trackUris, accessToken);
-        },
-        error: function(xhr, status, error) {
-          console.log("Error creating playlist:", error);
-        }
-      });
-    },
-    error: function(xhr, status, error) {
-      console.log("Error fetching user info:", error);
     }
   });
 }
@@ -368,65 +328,13 @@ function addTracksToPlaylist(playlistId, trackUris, accessToken) {
     }),
     success: function() {
       console.log("Tracks added to playlist successfully!");
-      // After adding tracks, play the playlist
-      playPlaylist(playlistId, accessToken);
+      alert("Playlist created and tracks added successfully!");
     },
     error: function(xhr, status, error) {
       console.log("Error adding tracks to playlist:", error);
     }
   });
 }
-
-
-function playPlaylist(playlistId, accessToken) {
-  window.onSpotifyWebPlaybackSDKReady = () => {
-    const player = new Spotify.Player({
-      name: 'Web Playback SDK Player',
-      getOAuthToken: cb => { cb(accessToken); }
-    });
-
-    player.addListener('initialization_error', ({ message }) => { console.error(message); });
-    player.addListener('authentication_error', ({ message }) => { console.error(message);
-    player.addListener('account_error', ({ message }) => { console.error(message); });
-    player.addListener('playback_error', ({ message }) => { console.error(message); });
-
-    player.addListener('player_state_changed', state => { console.log(state); });
-
-    player.addListener('ready', ({ device_id }) => {
-      console.log('Ready with Device ID', device_id);
-
-      fetch('https://api.spotify.com/v1/me/player', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          device_ids: [device_id],
-          play: true
-        })
-      });
-
-      fetch(`https://api.spotify.com/v1/me/player/play`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          context_uri: `spotify:playlist:${playlistId}`
-        })
-      });
-    });
-
-    player.addListener('not_ready', ({ device_id }) => {
-      console.log('Device ID has gone offline', device_id);
-    });
-
-    player.connect();
-  };
-}
-
 </script>
 
 </body>
