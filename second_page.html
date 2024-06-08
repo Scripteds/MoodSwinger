@@ -13,15 +13,6 @@
 <body>
 
 <h1>Spotify API Mood Search</h1>
-<div class="search-container">
-    <select id="moods">
-        <option value="0">Select a mood...</option>
-        <option value="chill">Chill</option>
-        <option value="sad">Sad</option>
-        <option value="happy">Happy</option>
-    </select>
-    <button onclick="searchAndDisplayRandomPlaylist()">Search and Display Random Playlist</button>
-</div>
 <div id="results-container">
     <div id="results"></div>
 </div>
@@ -37,10 +28,7 @@ $(document).ready(function() {
 
     // Check if access token exists in URL
     var accessToken = getAccessToken();
-    if (accessToken) {
-        // If access token exists, store it in localStorage
-        localStorage.setItem('accessToken', accessToken);
-    } else {
+    if (!accessToken) {
         // If access token doesn't exist, redirect to index.html for login
         window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     }
@@ -50,15 +38,12 @@ $(document).ready(function() {
         localStorage.removeItem('accessToken');
         window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
+
+    // Call function to get and display playlist when the page loads
+    getAndDisplayPlaylist();
 });
 
-// Function to initialize Spotify Web Playback SDK
-function onSpotifyWebPlaybackSDKReady() {
-    // This function will be called once the SDK is loaded
-    console.log('Spotify Web Playback SDK is ready.');
-}
-
-function searchAndDisplayRandomPlaylist() {
+function getAndDisplayPlaylist() {
     var accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
         alert("Please login to Spotify.");
@@ -67,7 +52,7 @@ function searchAndDisplayRandomPlaylist() {
 
     getRandomUserPlaylist(accessToken).then(playlist => {
         if (playlist) {
-            displayPlaylist(playlist, accessToken);
+            displayPlaylist(playlist);
         } else {
             alert("No playlists found for the user.");
         }
@@ -97,7 +82,7 @@ function getRandomUserPlaylist(accessToken) {
     });
 }
 
-function displayPlaylist(playlist, accessToken) {
+function displayPlaylist(playlist) {
     var playlistHtml = '<h2>Random User Playlist:</h2>';
     playlistHtml += `<h3>${playlist.name}</h3>`;
     playlist.tracks.items.forEach(function(item) {
