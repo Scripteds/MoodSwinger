@@ -58,7 +58,13 @@ function getAndDisplayPlaylist() {
 
     getRandomUserPlaylist(accessToken).then(playlist => {
         if (playlist) {
-            displayPlaylist(playlist);
+            getPlaylistTracks(accessToken, playlist.id).then(tracks => {
+                if (tracks) {
+                    displayPlaylist(playlist, tracks);
+                } else {
+                    alert("No tracks found in the playlist.");
+                }
+            });
         } else {
             alert("No playlists found for the user.");
         }
@@ -90,16 +96,33 @@ function getRandomUserPlaylist(accessToken) {
     });
 }
 
-function displayPlaylist(playlist) {
+function getPlaylistTracks(accessToken, playlistId) {
+    var apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+
+    return $.ajax({
+        url: apiUrl,
+        type: "GET",
+        headers: {
+            "Authorization": "Bearer " + accessToken
+        }
+    }).then(response => {
+        return response.items;
+    }).catch(error => {
+        console.error('Error fetching playlist tracks:', error);
+        return null;
+    });
+}
+
+function displayPlaylist(playlist, tracks) {
     var playlistHtml = '<h2>Random User Playlist:</h2>';
     playlistHtml += `<h3>${playlist.name}</h3>`;
     
-    // Check if playlist.tracks is defined before accessing items
-    if (playlist.tracks && playlist.tracks.items) {
-        playlist.tracks.items.forEach(function(item) {
+    if (tracks.length > 0) {
+        tracks.forEach(function(item) {
+            var track = item.track;
             playlistHtml += '<div class="track">';
-            playlistHtml += `<p>${item.track.name} - ${item.track.artists.map(artist => artist.name).join(', ')}</p>`;
-            playlistHtml += `<a href="${item.track.external_urls.spotify}" target="_blank">Listen on Spotify</a>`;
+            playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
+            playlistHtml += `<a href="${track.external_urls.spotify}" target="_blank">Listen on Spotify</a>`;
             playlistHtml += '</div>';
         });
     } else {
