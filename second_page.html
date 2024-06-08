@@ -94,7 +94,7 @@ function displayPlaylist(playlist) {
     var playlistHtml = '<h2>Random User Playlist:</h2>';
     playlistHtml += `<h3>${playlist.name}</h3>`;
     
-    // Check if playlist.tracks.items is defined before iterating
+    // Check if playlist.tracks is defined before accessing items
     if (playlist.tracks && playlist.tracks.items) {
         playlist.tracks.items.forEach(function(item) {
             playlistHtml += '<div class="track">';
