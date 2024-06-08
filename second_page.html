@@ -175,9 +175,13 @@ function searchAndCreatePlaylist() {
     searchRecommendedTracks(selectedMood, accessToken).then(tracks => {
         if (tracks.length > 0) {
             createPlaylist(selectedMood, accessToken).then(playlistId => {
-                addTracksToPlaylist(playlistId, tracks, accessToken).then(() => {
-                    displayPlaylist(playlistId, accessToken);
-                });
+                if (playlistId) {
+                    addTracksToPlaylist(playlistId, tracks, accessToken).then(() => {
+                        displayPlaylist(playlistId, accessToken);
+                    });
+                } else {
+                    alert("Failed to create playlist.");
+                }
             });
         } else {
             alert("No tracks found for the selected mood.");
@@ -195,9 +199,10 @@ function searchRecommendedTracks(mood, accessToken) {
             "Authorization": "Bearer " + accessToken
         }
     }).then(response => {
+        console.log('Tracks:', response.tracks); // Log the tracks for debugging
         return response.tracks.map(track => track.uri);
     }).catch(error => {
-        console.log(error);
+        console.log('Error searching tracks:', error); // Log the error for debugging
         return [];
     });
 }
@@ -228,9 +233,10 @@ function createPlaylist(mood, accessToken) {
             })
         });
     }).then(response => {
+        console.log('Created playlist:', response); // Log the created playlist for debugging
         return response.id;
     }).catch(error => {
-        console.log(error);
+        console.log('Error creating playlist:', error); // Log the error for debugging
         return null;
     });
 }
@@ -248,8 +254,10 @@ function addTracksToPlaylist(playlistId, tracks, accessToken) {
         data: JSON.stringify({
             uris: tracks
         })
+    }).then(response => {
+        console.log('Added tracks to playlist:', response); // Log the response for debugging
     }).catch(error => {
-        console.log(error);
+        console.log('Error adding tracks to playlist:', error); // Log the error for debugging
     });
 }
 
@@ -263,6 +271,7 @@ function displayPlaylist(playlistId, accessToken) {
             "Authorization": "Bearer " + accessToken
         },
         success: function(response) {
+            console.log('Playlist details:', response); // Log the playlist details for debugging
             var playlistHtml = '<h2>Created Playlist:</h2>';
             playlistHtml += `<h3>${response.name}</h3>`;
             response.tracks.items.forEach(function(item) {
@@ -274,7 +283,7 @@ function displayPlaylist(playlistId, accessToken) {
             $("#results").html(playlistHtml);
         },
         error: function(xhr, status, error) {
-            console.log(error);
+            console.log('Error displaying playlist:', error); // Log the error for debugging
         }
     });
 }
