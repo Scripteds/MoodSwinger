@@ -159,7 +159,7 @@ function displayPlaylist(tracks) {
         tracks.forEach(function(track) {
             playlistHtml += `<div class="track">`;
             playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
-            playlistHtml += `<a href="${track.external_urls.spotify}" target="_blank">Listen on Spotify</a>`;
+            playlistHtml += `<button class="play-track" data-uri="${track.uri}">Play</button>`;
             playlistHtml += `</div>`;
         });
     } else {
@@ -167,6 +167,54 @@ function displayPlaylist(tracks) {
     }
     
     $("#playlist-tracks").html(playlistHtml);
+
+    // Add click event to play buttons
+    $(".play-track").click(function() {
+        var trackUri = $(this).data("uri");
+        playTrack(trackUri);
+    });
+}
+
+function playTrack(trackUri) {
+    if (player) {
+        player.getCurrentState().then(state => {
+            if (!state) {
+                console.error('Player is not ready');
+                return;
+            }
+
+            const { current_track, next_tracks } = state.track_window;
+            const currentTrackUri = current_track.uri;
+
+            // If the selected track is already playing, do nothing
+            if (currentTrackUri === trackUri) {
+                console.log('Track is already playing');
+                return;
+            }
+
+            // Check if the selected track is in the queue, if so, skip to it
+            const trackIndex = next_tracks.findIndex(track => track.uri === trackUri);
+            if (trackIndex !== -1) {
+                player.skipToNext().then(() => {
+                    console.log('Skipping to the next track');
+                    player.seek(0).then(() => {
+                        console.log('Seeking to the beginning of the track');
+                    });
+                });
+            } else {
+                // If the selected track is not in the queue, add it and play
+                player.addToQueue(trackUri).then(() => {
+                    console.log('Track added to queue');
+                    player.skipToNext().then(() => {
+                        console.log('Skipping to the next track');
+                        player.seek(0).then(() => {
+                            console.log('Seeking to the beginning of the track');
+                        });
+                    });
+                });
+            }
+        });
+    }
 }
 </script>
 </body>
