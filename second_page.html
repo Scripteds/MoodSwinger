@@ -17,20 +17,45 @@
     <div id="results"></div>
 </div>
 <button id="logout-button">Logout</button>
+<button id="play-button">Play</button>
+<button id="pause-button">Pause</button>
 
 <script>
 $(document).ready(function() {
+    var player;
+    var accessToken = getAccessToken();
+
+    // Initialize the Spotify Web Playback SDK
+    window.onSpotifyWebPlaybackSDKReady = () => {
+        player = new Spotify.Player({
+            name: 'Web Playback SDK Quick Start Player',
+            getOAuthToken: cb => { cb(accessToken); }
+        });
+
+        // Error handling
+        player.addListener('initialization_error', ({ message }) => { console.error(message); });
+        player.addListener('authentication_error', ({ message }) => { console.error(message); });
+        player.addListener('account_error', ({ message }) => { console.error(message); });
+        player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+        // Playback status updates
+        player.addListener('player_state_changed', state => { console.log(state); });
+
+        // Ready
+        player.addListener('ready', ({ device_id }) => {
+            console.log('Ready with Device ID', device_id);
+            $("#play-button").prop("disabled", false);
+            $("#pause-button").prop("disabled", false);
+        });
+
+        // Connect to the player!
+        player.connect();
+    };
+
     // Function to extract access token from URL parameter
     function getAccessToken() {
         const urlParams = new URLSearchParams(window.location.hash.substr(1));
         return urlParams.get('access_token');
-    }
-
-    // Check if access token exists in URL
-    var accessToken = getAccessToken();
-    if (!accessToken) {
-        // If access token doesn't exist, redirect to index.html for login
-        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     }
 
     $("#logout-button").click(function() {
@@ -39,15 +64,25 @@ $(document).ready(function() {
         window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
 
+    $("#play-button").click(function() {
+        if (player) {
+            player.resume().then(() => {
+                console.log('Playback resumed');
+            });
+        }
+    });
+
+    $("#pause-button").click(function() {
+        if (player) {
+            player.pause().then(() => {
+                console.log('Playback paused');
+            });
+        }
+    });
+
     // Call function to get and display playlist when the page loads
     getAndDisplayPlaylist();
 });
-
-// Define onSpotifyWebPlaybackSDKReady function to avoid error
-function onSpotifyWebPlaybackSDKReady() {
-    // This function will be called once the SDK is loaded
-    console.log('Spotify Web Playback SDK is ready.');
-}
 
 function getAndDisplayPlaylist() {
     var accessToken = localStorage.getItem('accessToken');
@@ -107,7 +142,7 @@ function getPlaylistItems(accessToken, playlistId) {
         }
     }).then(response => {
         // Extract tracks from the response
-        return response.items;
+        return response.items.map(item => item.track.uri);
     }).catch(error => {
         console.error('Error fetching playlist tracks:', error);
         return null;
@@ -119,12 +154,8 @@ function displayPlaylist(playlist, tracks) {
     playlistHtml += `<h3>${playlist.name}</h3>`;
     
     if (tracks.length > 0) {
-        tracks.forEach(function(item) {
-            var track = item.track;
-            playlistHtml += '<div class="track">';
-            playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
-            playlistHtml += `<a href="${track.external_urls.spotify}" target="_blank">Listen on Spotify</a>`;
-            playlistHtml += '</div>';
+        tracks.forEach(function(uri) {
+            playlistHtml += `<iframe src="https://open.spotify.com/embed/track/${uri}" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
         });
     } else {
         playlistHtml += '<p>No tracks found in the playlist.</p>';
