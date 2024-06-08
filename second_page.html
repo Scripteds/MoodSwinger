@@ -7,114 +7,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
 <style>
-/* Body style */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-  background-color: #f9f9f9;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Heading style */
-h1 {
-  color: #1db954;
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-/* Search container */
-.search-container {
-  dis: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-/* Select dropdown style */
-#moods {
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  width: 250px;
-  margin-bottom: 20px;
-  font-size: 16px;
-}
-
-/* Search button style */
-button {
-  padding: 10px 20px;
-  background-color: #1db954;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #1ed760;
-}
-
-/* Results container style */
-#results-container {
-  width: 100%;
-  max-width: 600px;
-  text-align: center;
-  margin-top: 20px;
-}
-
-/* Individual track style */
-.track {
-  padding: 15px;
-  margin: 0 auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 500px; /* Increased max-width for larger display */
-}
-
-.track p {
-  margin: 0;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.track a {
-  display: block;
-  margin-top: 10px;
-  color: #1db954;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.track a:hover {
-  text-decoration: underline;
-}
-
-/* Logout button style */
-#logout-button {
-  display: block;
-  margin: 30px auto;
-  padding: 10px 20px;
-  background-color: #ff3b3b;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-}
-
-#logout-button:hover {
-  background-color: #ff5e5e;
-}
+/* Your CSS styles */
 </style>
 </head>
 <body>
@@ -127,7 +20,7 @@ button:hover {
         <option value="sad">Sad</option>
         <option value="happy">Happy</option>
     </select>
-    <button onclick="searchAndCreatePlaylist()">Search and Create Playlist</button>
+    <button onclick="searchAndDisplayRandomPlaylist()">Search and Display Random Playlist</button>
 </div>
 <div id="results-container">
     <div id="results"></div>
@@ -136,61 +29,27 @@ button:hover {
 
 <script>
 $(document).ready(function() {
-    // Function to extract access token from URL parameter
-    function getAccessToken() {
-        const urlParams = new URLSearchParams(window.location.hash.substr(1));
-        return urlParams.get('access_token');
-    }
-
-    // Check if access token exists in URL
-    var accessToken = getAccessToken();
-    if (accessToken) {
-        // If access token exists, store it in localStorage
-        localStorage.setItem('accessToken', accessToken);
-    } else {
-        // If access token doesn't exist, redirect to index.html for login
-        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-    }
-
-    $("#logout-button").click(function() {
-        // Clear access token and redirect to login page
-        localStorage.removeItem('accessToken');
-        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-    });
+    // Your existing code for getting access token and logout button click handler
 });
 
-function searchAndCreatePlaylist() {
-    var selectedMood = $("#moods").val();
-    if (selectedMood == "0") {
-        alert("Please select a mood.");
-        return;
-    }
-
+function searchAndDisplayRandomPlaylist() {
     var accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
         alert("Please login to Spotify.");
         return;
     }
 
-    searchRecommendedTracks(selectedMood, accessToken).then(tracks => {
-        if (tracks.length > 0) {
-            createPlaylist(selectedMood, accessToken).then(playlistId => {
-                if (playlistId) {
-                    addTracksToPlaylist(playlistId, tracks, accessToken).then(() => {
-                        displayPlaylist(playlistId, accessToken);
-                    });
-                } else {
-                    alert("Failed to create playlist.");
-                }
-            });
+    getRandomUserPlaylist(accessToken).then(playlist => {
+        if (playlist) {
+            displayPlaylist(playlist, accessToken);
         } else {
-            alert("No tracks found for the selected mood.");
+            alert("No playlists found for the user.");
         }
     });
 }
 
-function searchRecommendedTracks(mood, accessToken) {
-    var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=10";
+function getRandomUserPlaylist(accessToken) {
+    var apiUrl = "https://api.spotify.com/v1/me/playlists";
 
     return $.ajax({
         url: apiUrl,
@@ -199,93 +58,29 @@ function searchRecommendedTracks(mood, accessToken) {
             "Authorization": "Bearer " + accessToken
         }
     }).then(response => {
-        console.log('Tracks:', response.tracks); // Log the tracks for debugging
-        return response.tracks.map(track => track.uri);
-    }).catch(error => {
-        console.log('Error searching tracks:', error); // Log the error for debugging
-        return [];
-    });
-}
-
-function createPlaylist(mood, accessToken) {
-    var userId;
-    var apiUrl = "https://api.spotify.com/v1/me";
-
-    return $.ajax({
-        url: apiUrl,
-        type: "GET",
-        headers: {
-            "Authorization": "Bearer " + accessToken
+        // Choose a random playlist from the user's playlists
+        if (response.items.length > 0) {
+            var randomIndex = Math.floor(Math.random() * response.items.length);
+            return response.items[randomIndex];
+        } else {
+            return null;
         }
-    }).then(response => {
-        userId = response.id;
-        return $.ajax({
-            url: `https://api.spotify.com/v1/users/${userId}/playlists`,
-            type: "POST",
-            headers: {
-                "Authorization": "Bearer " + accessToken,
-                "Content-Type": "application/json"
-            },
-            data: JSON.stringify({
-                name: mood.charAt(0).toUpperCase() + mood.slice(1) + " Mood Playlist",
-                description: "Playlist created based on your mood selection",
-                public: false
-            })
-        });
-    }).then(response => {
-        console.log('Created playlist:', response); // Log the created playlist for debugging
-        return response.id;
     }).catch(error => {
-        console.log('Error creating playlist:', error); // Log the error for debugging
+        console.log('Error fetching user playlists:', error);
         return null;
     });
 }
 
-function addTracksToPlaylist(playlistId, tracks, accessToken) {
-    var apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
-
-    return $.ajax({
-        url: apiUrl,
-        type: "POST",
-        headers: {
-            "Authorization": "Bearer " + accessToken,
-            "Content-Type": "application/json"
-        },
-        data: JSON.stringify({
-            uris: tracks
-        })
-    }).then(response => {
-        console.log('Added tracks to playlist:', response); // Log the response for debugging
-    }).catch(error => {
-        console.log('Error adding tracks to playlist:', error); // Log the error for debugging
+function displayPlaylist(playlist, accessToken) {
+    var playlistHtml = '<h2>Random User Playlist:</h2>';
+    playlistHtml += `<h3>${playlist.name}</h3>`;
+    playlist.tracks.items.forEach(function(item) {
+        playlistHtml += '<div class="track">';
+        playlistHtml += `<p>${item.track.name} - ${item.track.artists.map(artist => artist.name).join(', ')}</p>`;
+        playlistHtml += `<a href="${item.track.external_urls.spotify}" target="_blank">Listen on Spotify</a>`;
+        playlistHtml += '</div>';
     });
-}
-
-function displayPlaylist(playlistId, accessToken) {
-    var apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}`;
-
-    $.ajax({
-        url: apiUrl,
-        type: "GET",
-        headers: {
-            "Authorization": "Bearer " + accessToken
-        },
-        success: function(response) {
-            console.log('Playlist details:', response); // Log the playlist details for debugging
-            var playlistHtml = '<h2>Created Playlist:</h2>';
-            playlistHtml += `<h3>${response.name}</h3>`;
-            response.tracks.items.forEach(function(item) {
-                playlistHtml += '<div class="track">';
-                playlistHtml += `<p>${item.track.name} - ${item.track.artists.map(artist => artist.name).join(', ')}</p>`;
-                playlistHtml += `<a href="${item.track.external_urls.spotify}" target="_blank">Listen on Spotify</a>`;
-                playlistHtml += '</div>';
-            });
-            $("#results").html(playlistHtml);
-        },
-        error: function(xhr, status, error) {
-            console.log('Error fetching playlist details:', error); // Log the error for debugging
-        }
-    });
+    $("#results").html(playlistHtml);
 }
 </script>
 </body>
