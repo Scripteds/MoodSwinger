@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spotify API Mood Search</title>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://sdk.scdn.co/spotify-player.js"></script>
-<style>
-/* Your CSS styles */
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify API Mood Search</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <style>
+        /* Your CSS styles */
+    </style>
 </head>
 <body>
 
@@ -23,166 +23,161 @@
 <button id="pause-button">Pause</button>
 
 <script>
-$(document).ready(function() {
-    var player;
-    var accessToken = getAccessToken();
+    $(document).ready(function() {
+        var player;
+        var accessToken = getAccessToken();
 
-    // Initialize the Spotify Web Playback SDK
-    window.onSpotifyWebPlaybackSDKReady = () => {
-        player = new Spotify.Player({
-            name: 'Web Playback SDK Quick Start Player',
-            getOAuthToken: cb => { cb(accessToken); }
+        // Initialize the Spotify Web Playback SDK
+        window.onSpotifyWebPlaybackSDKReady = () => {
+            player = new Spotify.Player({
+                name: 'Web Playback SDK Quick Start Player',
+                getOAuthToken: cb => { cb(accessToken); }
+            });
+
+            // Error handling
+            player.addListener('initialization_error', ({ message }) => { console.error(message); });
+            player.addListener('authentication_error', ({ message }) => { console.error(message); });
+            player.addListener('account_error', ({ message }) => { console.error(message); });
+            player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+            // Playback status updates
+            player.addListener('player_state_changed', state => { console.log(state); });
+
+            // Ready
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Ready with Device ID', device_id);
+                $("#play-button").prop("disabled", false);
+                $("#pause-button").prop("disabled", false);
+            });
+
+            // Connect to the player!
+            player.connect();
+        };
+
+        // Function to extract access token from URL parameter
+        function getAccessToken() {
+            const urlParams = new URLSearchParams(window.location.hash.substr(1));
+            const token = urlParams.get('access_token');
+            if (!token) {
+                console.error("Access token not found.");
+                // Redirect to login page if token is not found
+                window.location.href = "index.html";
+            }
+            return token;
+        }
+
+        $("#logout-button").click(function() {
+            // Clear access token and redirect to login page
+            localStorage.removeItem('accessToken');
+            window.location.href = "index.html";
         });
 
-        // Error handling
-        player.addListener('initialization_error', ({ message }) => { console.error(message); });
-        player.addListener('authentication_error', ({ message }) => { console.error(message); });
-        player.addListener('account_error', ({ message }) => { console.error(message); });
-        player.addListener('playback_error', ({ message }) => { console.error(message); });
-
-        // Playback status updates
-        player.addListener('player_state_changed', state => { console.log(state); });
-
-        // Ready
-        player.addListener('ready', ({ device_id }) => {
-            console.log('Ready with Device ID', device_id);
-            $("#play-button").prop("disabled", false);
-            $("#pause-button").prop("disabled", false);
+        $("#play-button").click(function() {
+            if (player) {
+                player.resume().then(() => {
+                    console.log('Playback resumed');
+                });
+            }
         });
 
-        // Connect to the player!
-        player.connect();
-    };
+        $("#pause-button").click(function() {
+            if (player) {
+                player.pause().then(() => {
+                    console.log('Playback paused');
+                });
+            }
+        });
 
-    // Function to extract access token from URL parameter
-    function getAccessToken() {
-        const urlParams = new URLSearchParams(window.location.hash.substr(1));
-        const token = urlParams.get('access_token');
-        if (!token) {
-            console.error("Access token not found.");
-            window.location.href = "https://scripteds.github.io/MoodSwinger/";
-        }
-        return token;
+        // Call function to get and display playlist when the page loads
+        getAndDisplayPlaylist();
+    });
+
+    function getAndDisplayPlaylist() {
+        var accessToken = getAccessToken();
+        getRandomUserPlaylist(accessToken)
+            .then(playlist => {
+                if (playlist) {
+                    $("#playlist-name").text(playlist.name); // Display playlist name
+                    getPlaylistItems(accessToken, playlist.id)
+                        .then(tracks => {
+                            if (tracks) {
+                                displayPlaylist(tracks);
+                            } else {
+                                alert("No tracks found in the playlist.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error fetching playlist items:", error);
+                        });
+                } else {
+                    alert("No playlists found for the user.");
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user playlists:', error);
+            });
     }
 
-    $("#logout-button").click(function() {
-        // Clear access token and redirect to login page
-        localStorage.removeItem('accessToken');
-        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-    });
+    function getRandomUserPlaylist(accessToken) {
+        var apiUrl = "https://api.spotify.com/v1/me/playlists";
 
-    $("#play-button").click(function() {
-        if (player) {
-            player.resume().then(() => {
-                console.log('Playback resumed');
-            });
-        }
-    });
-
-    $("#pause-button").click(function() {
-        if (player) {
-            player.pause().then(() => {
-                console.log('Playback paused');
-            });
-        }
-    });
-
-    // Call function to get and display playlist when the page loads
-    getAndDisplayPlaylist();
-});
-
-function getAndDisplayPlaylist() {
-    var accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-        alert("Please login to Spotify.");
-        return;
-    }
-
-    getRandomUserPlaylist(accessToken)
-        .then(playlist => {
-            if (playlist) {
-                $("#playlist-name").text(playlist.name); // Display playlist name
-                getPlaylistItems(accessToken, playlist.id)
-                    .then(tracks => {
-                        if (tracks) {
-                            displayPlaylist(tracks);
-                        } else {
-                            alert("No tracks found in the playlist.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching playlist items:", error);
-                    });
+        return $.ajax({
+            url: apiUrl,
+            type: "GET",
+            headers: {
+                "Authorization": "Bearer " + accessToken
+            }
+        }).then(response => {
+            // Choose a random playlist from the user's playlists
+            if (response.items.length > 0) {
+                var randomIndex = Math.floor(Math.random() * response.items.length);
+                return response.items[randomIndex];
             } else {
-                alert("No playlists found for the user.");
+                return null;
             }
-        })
-        .catch(error => {
+        }).catch(error => {
             console.error('Error fetching user playlists:', error);
-        });
-}
-
-function getRandomUserPlaylist(accessToken) {
-    var apiUrl = "https://api.spotify.com/v1/me/playlists";
-
-    return $.ajax({
-        url: apiUrl,
-        type: "GET",
-        headers: {
-            "Authorization": "Bearer " + accessToken
-        }
-    }).then(response => {
-        // Choose a random playlist from the user's playlists
-        if (response.items.length > 0) {
-            var randomIndex = Math.floor(Math.random() * response.items.length);
-            return response.items[randomIndex];
-        } else {
             return null;
-        }
-    }).catch(error => {
-        console.error('Error fetching user playlists:', error);
-        return null;
-    });
-}
-
-function getPlaylistItems(accessToken, playlistId) {
-    var apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
-
-    return $.ajax({
-        url: apiUrl,
-        type: "GET",
-        headers: {
-            "Authorization": "Bearer " + accessToken
-        }
-    }).then(response => {
-        console.log("Playlist items response:", response); // Log the response
-        // Extract tracks from the response
-        return response.items.map(item => item.track);
-    }).catch(error => {
-        console.error('Error fetching playlist tracks:', error);
-        return null;
-    });
-}
-
-function displayPlaylist(tracks) {
-    var playlistHtml = '';
-
-    if (tracks && tracks.length > 0) { // Check if tracks is not null and has length
-        tracks.forEach(function(track) {
-            if (track && track.name && track.artists) { // Check if track and its properties are not null
-                playlistHtml += `<div class="track">`;
-                playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
-                playlistHtml += `<iframe src="https://open.spotify.com/embed/track/${track.id}" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
-                playlistHtml += `</div>`;
-            }
         });
-    } else {
-        playlistHtml += '<p>No tracks found in the playlist.</p>';
     }
 
-    $("#playlist-tracks").html(playlistHtml);
-}
+    function getPlaylistItems(accessToken, playlistId) {
+        var apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
+        return $.ajax({
+            url: apiUrl,
+            type: "GET",
+            headers: {
+                "Authorization": "Bearer " + accessToken
+            }
+        }).then(response => {
+            console.log("Playlist items response:", response); // Log the response
+            // Extract tracks from the response
+            return response.items.map(item => item.track);
+        }).catch(error => {
+            console.error('Error fetching playlist tracks:', error);
+            return null;
+        });
+    }
+
+    function displayPlaylist(tracks) {
+        var playlistHtml = '';
+
+        if (tracks && tracks.length > 0) { // Check if tracks is not null and has length
+            tracks.forEach(function(track) {
+                if (track && track.name && track.artists) { // Check if track and its properties are not null
+                    playlistHtml += `<div class="track">`;
+                    playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
+                    playlistHtml += `<iframe src="https://open.spotify.com/embed/track/${track.id}" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+                    playlistHtml += `</div>`;
+                }
+            });
+        } else {
+            playlistHtml += '<p>No tracks found in the playlist.</p>';
+        }
+
+        $("#playlist-tracks").html(playlistHtml);
+    }
 </script>
 </body>
 </html>
