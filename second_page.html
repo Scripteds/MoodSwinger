@@ -43,6 +43,12 @@ $(document).ready(function() {
     getAndDisplayPlaylist();
 });
 
+// Define onSpotifyWebPlaybackSDKReady function to avoid error
+function onSpotifyWebPlaybackSDKReady() {
+    // This function will be called once the SDK is loaded
+    console.log('Spotify Web Playback SDK is ready.');
+}
+
 function getAndDisplayPlaylist() {
     var accessToken = localStorage.getItem('accessToken');
     if (!accessToken) {
@@ -54,7 +60,7 @@ function getAndDisplayPlaylist() {
         if (playlist) {
             displayPlaylist(playlist);
         } else {
-            console.error("No playlists found for the user.");
+            alert("No playlists found for the user.");
         }
     }).catch(error => {
         console.error('Error fetching user playlists:', error);
@@ -87,12 +93,19 @@ function getRandomUserPlaylist(accessToken) {
 function displayPlaylist(playlist) {
     var playlistHtml = '<h2>Random User Playlist:</h2>';
     playlistHtml += `<h3>${playlist.name}</h3>`;
-    playlist.tracks.items.forEach(function(item) {
-        playlistHtml += '<div class="track">';
-        playlistHtml += `<p>${item.track.name} - ${item.track.artists.map(artist => artist.name).join(', ')}</p>`;
-        playlistHtml += `<a href="${item.track.external_urls.spotify}" target="_blank">Listen on Spotify</a>`;
-        playlistHtml += '</div>';
-    });
+    
+    // Check if playlist.tracks.items is defined before iterating
+    if (playlist.tracks && playlist.tracks.items) {
+        playlist.tracks.items.forEach(function(item) {
+            playlistHtml += '<div class="track">';
+            playlistHtml += `<p>${item.track.name} - ${item.track.artists.map(artist => artist.name).join(', ')}</p>`;
+            playlistHtml += `<a href="${item.track.external_urls.spotify}" target="_blank">Listen on Spotify</a>`;
+            playlistHtml += '</div>';
+        });
+    } else {
+        playlistHtml += '<p>No tracks found in the playlist.</p>';
+    }
+    
     $("#results").html(playlistHtml);
 }
 </script>
