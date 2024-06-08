@@ -169,10 +169,12 @@ function displayPlaylist(tracks) {
 
     if (tracks && tracks.length > 0) { // Check if tracks is not null and has length
         tracks.forEach(function(track) {
-            playlistHtml += `<div class="track">`;
-            playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
-            playlistHtml += `<button class="play-track" data-uri="${track.uri}">Play</button>`;
-            playlistHtml += `</div>`;
+            if (track && track.name && track.artists) { // Check if track and its properties are not null
+                playlistHtml += `<div class="track">`;
+                playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
+                playlistHtml += `<button class="play-track" data-uri="${track.uri}">Play</button>`;
+                playlistHtml += `</div>`;
+            }
         });
     } else {
         playlistHtml += '<p>No tracks found in the playlist.</p>';
@@ -186,6 +188,7 @@ function displayPlaylist(tracks) {
         playTrack(trackUri);
     });
 }
+
 
 
 function playTrack(trackUri) {
