@@ -283,7 +283,7 @@ function displayPlaylist(playlistId, accessToken) {
             $("#results").html(playlistHtml);
         },
         error: function(xhr, status, error) {
-            console.log('Error displaying playlist:', error); // Log the error for debugging
+            console.log('Error fetching playlist details:', error); // Log the error for debugging
         }
     });
 }
