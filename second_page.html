@@ -29,8 +29,34 @@
 
 <script>
 $(document).ready(function() {
-    // Your existing code for getting access token and logout button click handler
+    // Function to extract access token from URL parameter
+    function getAccessToken() {
+        const urlParams = new URLSearchParams(window.location.hash.substr(1));
+        return urlParams.get('access_token');
+    }
+
+    // Check if access token exists in URL
+    var accessToken = getAccessToken();
+    if (accessToken) {
+        // If access token exists, store it in localStorage
+        localStorage.setItem('accessToken', accessToken);
+    } else {
+        // If access token doesn't exist, redirect to index.html for login
+        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+    }
+
+    $("#logout-button").click(function() {
+        // Clear access token and redirect to login page
+        localStorage.removeItem('accessToken');
+        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+    });
 });
+
+// Function to initialize Spotify Web Playback SDK
+function onSpotifyWebPlaybackSDKReady() {
+    // This function will be called once the SDK is loaded
+    console.log('Spotify Web Playback SDK is ready.');
+}
 
 function searchAndDisplayRandomPlaylist() {
     var accessToken = localStorage.getItem('accessToken');
