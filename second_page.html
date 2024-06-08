@@ -93,22 +93,28 @@ function getAndDisplayPlaylist() {
         return;
     }
 
-    getRandomUserPlaylist(accessToken).then(playlist => {
-        if (playlist) {
-            $("#playlist-name").text(playlist.name); // Display playlist name
-            getPlaylistItems(accessToken, playlist.id).then(tracks => {
-                if (tracks) {
-                    displayPlaylist(tracks);
-                } else {
-                    alert("No tracks found in the playlist.");
-                }
-            });
-        } else {
-            alert("No playlists found for the user.");
-        }
-    }).catch(error => {
-        console.error('Error fetching user playlists:', error);
-    });
+    getRandomUserPlaylist(accessToken)
+        .then(playlist => {
+            if (playlist) {
+                $("#playlist-name").text(playlist.name); // Display playlist name
+                getPlaylistItems(accessToken, playlist.id)
+                    .then(tracks => {
+                        if (tracks) {
+                            displayPlaylist(tracks);
+                        } else {
+                            alert("No tracks found in the playlist.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching playlist items:", error);
+                    });
+            } else {
+                alert("No playlists found for the user.");
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user playlists:', error);
+        });
 }
 
 function getRandomUserPlaylist(accessToken) {
@@ -144,6 +150,7 @@ function getPlaylistItems(accessToken, playlistId) {
             "Authorization": "Bearer " + accessToken
         }
     }).then(response => {
+        console.log("Playlist items response:", response); // Log the response
         // Extract tracks from the response
         return response.items.map(item => item.track);
     }).catch(error => {
