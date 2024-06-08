@@ -55,10 +55,15 @@ $(document).ready(function() {
     };
 
     // Function to extract access token from URL parameter
-    function getAccessToken() {
-        const urlParams = new URLSearchParams(window.location.hash.substr(1));
-        return urlParams.get('access_token');
+   function getAccessToken() {
+    const urlParams = new URLSearchParams(window.location.hash.substr(1));
+    const token = urlParams.get('access_token');
+    if (!token) {
+        console.error("Access token not found.");
+       window.location.href = "https://scripteds.github.io/MoodSwinger/";
     }
+    return token;
+}
 
     $("#logout-button").click(function() {
         // Clear access token and redirect to login page
@@ -161,8 +166,8 @@ function getPlaylistItems(accessToken, playlistId) {
 
 function displayPlaylist(tracks) {
     var playlistHtml = '';
-    
-    if (tracks.length > 0) {
+
+    if (tracks && tracks.length > 0) { // Check if tracks is not null and has length
         tracks.forEach(function(track) {
             playlistHtml += `<div class="track">`;
             playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
@@ -172,7 +177,7 @@ function displayPlaylist(tracks) {
     } else {
         playlistHtml += '<p>No tracks found in the playlist.</p>';
     }
-    
+
     $("#playlist-tracks").html(playlistHtml);
 
     // Add click event to play buttons
@@ -181,6 +186,7 @@ function displayPlaylist(tracks) {
         playTrack(trackUri);
     });
 }
+
 
 function playTrack(trackUri) {
     if (player) {
