@@ -5,231 +5,309 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spotify API Mood Search</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://sdk.scdn.co/spotify-player.js"></script>
 <style>
-/* Your CSS styles */
+/* Body style */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Heading style */
+h1 {
+  color: #1db954;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Search container */
+.search-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Track details container */
+.track-details {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Track title */
+.track-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Artist name and release year */
+.artist-release {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+/* Spotify embed style */
+iframe {
+  width: 100%;
+  height: 300px;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Select dropdown style */
+#moods {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 250px;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+/* Search button style */
+button {
+  padding: 10px 20px;
+  background-color: #1db954;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #1ed760;
+}
+
+/* Results container style */
+#results-container {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Tracks container style */
+.tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Individual track style */
+.track {
+  padding: 15px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px; /* Increased max-width for larger display */
+}
+
+.track p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.track a {
+  display: block;
+  margin-top: 10px;
+  color: #1db954;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.track a:hover {
+  text-decoration: underline;
+}
+
+/* Logout button style */
+#logout-button {
+  display: block;
+  margin: 30px auto;
+  padding: 10px 20px;
+  background-color: #ff3b3b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+#logout-button:hover {
+  background-color: #ff5e5e;
+}
+
+/* Back button style */
+#back-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #555;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+#back-button:hover {
+  background-color: #777;
+}
 </style>
 </head>
 <body>
 
 <h1>Spotify API Mood Search</h1>
-<div id="results-container">
-    <h2>Random User Playlist:</h2>
-    <h3 id="playlist-name"></h3>
-    <div id="playlist-tracks"></div>
+
+<div class="search-container">
+  <select id="moods">
+    <option value="0">Select a mood...</option>
+    <option value="chill">Chill</option>
+    <option value="sad">Sad</option>
+    <option value="happy">Happy</option>
+  </select>
+
+  <button onclick="searchSongs()">Search</button>
 </div>
+
+<div id="results-container">
+  <div id="results"></div>
+</div>
+
 <button id="logout-button">Logout</button>
-<button id="play-button">Play</button>
-<button id="pause-button">Pause</button>
 
 <script>
 $(document).ready(function() {
-    var player;
-    var accessToken = getAccessToken();
+  // Attach event listener to logout button
+  $("#logout-button").click(function() {
+    // Redirect to index.html
+    window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+  });
 
-    // Initialize the Spotify Web Playback SDK
-    window.onSpotifyWebPlaybackSDKReady = () => {
-        player = new Spotify.Player({
-            name: 'Web Playback SDK Quick Start Player',
-            getOAuthToken: cb => { cb(accessToken); }
-        });
+  // Retrieve stored search results and selected mood from sessionStorage
+  const storedResults = sessionStorage.getItem('searchResults');
+  const selectedMood = sessionStorage.getItem('selectedMood');
 
-        // Error handling
-        player.addListener('initialization_error', ({ message }) => { console.error(message); });
-        player.addListener('authentication_error', ({ message }) => { console.error(message); });
-        player.addListener('account_error', ({ message }) => { console.error(message); });
-        player.addListener('playback_error', ({ message }) => { console.error(message); });
-
-        // Playback status updates
-        player.addListener('player_state_changed', state => { console.log(state); });
-
-        // Ready
-        player.addListener('ready', ({ device_id }) => {
-            console.log('Ready with Device ID', device_id);
-            $("#play-button").prop("disabled", false);
-            $("#pause-button").prop("disabled", false);
-        });
-
-        // Connect to the player!
-        player.connect();
-    };
-
-    // Function to extract access token from URL parameter
-   function getAccessToken() {
-    const urlParams = new URLSearchParams(window.location.hash.substr(1));
-    const token = urlParams.get('access_token');
-    if (!token) {
-        console.error("Access token not found.");
-       window.location.href = "https://scripteds.github.io/MoodSwinger/";
-    }
-    return token;
-}
-
-    $("#logout-button").click(function() {
-        // Clear access token and redirect to login page
-        localStorage.removeItem('accessToken');
-        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-    });
-
-    $("#play-button").click(function() {
-        if (player) {
-            player.resume().then(() => {
-                console.log('Playback resumed');
-            });
-        }
-    });
-
-    $("#pause-button").click(function() {
-        if (player) {
-            player.pause().then(() => {
-                console.log('Playback paused');
-            });
-        }
-    });
-
-    // Call function to get and display playlist when the page loads
-    getAndDisplayPlaylist();
+  if (storedResults && selectedMood) {
+    $('#moods').val(selectedMood);
+    $('#results').html(storedResults);
+  }
 });
 
-function getAndDisplayPlaylist() {
-    var accessToken = localStorage.getItem('accessToken');
-    if (!accessToken) {
-        alert("Please login to Spotify.");
-        return;
+function searchSongs() {
+  var selectedMood = $("#moods").val();
+  if (selectedMood == "0") {
+    alert("Please select a mood.");
+    return;
+  }
+
+  // Store selected mood in sessionStorage
+  sessionStorage.setItem('selectedMood', selectedMood);
+
+  // Client ID and Client Secret
+  var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
+  var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
+
+  // Request access token
+  $.ajax({
+    url: "https://accounts.spotify.com/api/token",
+    type: "POST",
+    headers: {
+      "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
+    },
+    data: {
+      "grant_type": "client_credentials"
+    },
+    success: function(response) {
+      var accessToken = response.access_token;
+      searchRecommendedTracks(selectedMood, accessToken);
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
     }
-
-    getRandomUserPlaylist(accessToken)
-        .then(playlist => {
-            if (playlist) {
-                $("#playlist-name").text(playlist.name); // Display playlist name
-                getPlaylistItems(accessToken, playlist.id)
-                    .then(tracks => {
-                        if (tracks) {
-                            displayPlaylist(tracks);
-                        } else {
-                            alert("No tracks found in the playlist.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching playlist items:", error);
-                    });
-            } else {
-                alert("No playlists found for the user.");
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching user playlists:', error);
-        });
+  });
 }
 
-function getRandomUserPlaylist(accessToken) {
-    var apiUrl = "https://api.spotify.com/v1/me/playlists";
+function searchRecommendedTracks(mood, accessToken) {
+  // Use Spotify's recommendation API to get recommended tracks based on mood
+  var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
 
-    return $.ajax({
-        url: apiUrl,
-        type: "GET",
-        headers: {
-            "Authorization": "Bearer " + accessToken
-        }
-    }).then(response => {
-        // Choose a random playlist from the user's playlists
-        if (response.items.length > 0) {
-            var randomIndex = Math.floor(Math.random() * response.items.length);
-            return response.items[randomIndex];
-        } else {
-            return null;
-        }
-    }).catch(error => {
-        console.error('Error fetching user playlists:', error);
-        return null;
-    });
-}
+  if (!accessToken) {
+    console.log("Access token not available.");
+    return;
+  }
 
-function getPlaylistItems(accessToken, playlistId) {
-    var apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
-
-    return $.ajax({
-        url: apiUrl,
-        type: "GET",
-        headers: {
-            "Authorization": "Bearer " + accessToken
-        }
-    }).then(response => {
-        console.log("Playlist items response:", response); // Log the response
-        // Extract tracks from the response
-        return response.items.map(item => item.track);
-    }).catch(error => {
-        console.error('Error fetching playlist tracks:', error);
-        return null;
-    });
-}
-
-function displayPlaylist(tracks) {
-    var playlistHtml = '';
-
-    if (tracks && tracks.length > 0) { // Check if tracks is not null and has length
-        tracks.forEach(function(track) {
-            if (track && track.name && track.artists) { // Check if track and its properties are not null
-                playlistHtml += `<div class="track">`;
-                playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
-                playlistHtml += `<button class="play-track" data-uri="${track.uri}">Play</button>`;
-                playlistHtml += `</div>`;
-            }
-        });
-    } else {
-        playlistHtml += '<p>No tracks found in the playlist.</p>';
+  $.ajax({
+    url: apiUrl,
+    type: "GET",
+    headers: {
+      "Authorization": "Bearer " + accessToken
+    },
+    success: function(response) {
+      displayResults(response);
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
     }
+  });
+}
 
-    $("#playlist-tracks").html(playlistHtml);
+function displayResults(data) {
+  var tracks = data.tracks;
+  var html = "<h2>Recommended Tracks</h2>";
+  html += "<div class='tracks'>";
+  var count = 0;
+  for (var i = 0; i < tracks.length && count < 5; i++) {
+    var trackName = tracks[i].name;
+    var trackId = tracks[i].id;
+    var artistName = tracks[i].artists[0].name;
+    var releaseYear = new Date(tracks[i].album.release_date).getFullYear();
+    var previewUrl = tracks[i].preview_url;
+    var spotifyUrl = "https://open.spotify.com/track/" + trackId;
+    if (previewUrl) {
+      html += "<div class='track'>";
+      html += '<p>' + trackName + ' - ' + artistName + '</p>';
+      html += '<button class="play-track" data-uri="' + previewUrl + '">Play</button>';
+      html += "</div>";
+      count++;
+    }
+  }
+  html += "</div>";
+  $("#results").html(html);
 
-    // Add click event to play buttons
-    $(".play-track").click(function() {
-        var trackUri = $(this).data("uri");
-        playTrack(trackUri);
-    });
+  // Add click event to play buttons
+  $(".play-track").click(function() {
+    var trackUri = $(this).data("uri");
+    playTrack(trackUri);
+  });
 }
 
 function playTrack(trackUri) {
-    if (player) {
-        player.getCurrentState().then(state => {
-            if (!state) {
-                console.error('Player is not ready');
-                return;
-            }
-
-            const { current_track, next_tracks } = state.track_window;
-            const currentTrackUri = current_track.uri;
-
-            // If the selected track is already playing, do nothing
-            if (currentTrackUri === trackUri) {
-                console.log('Track is already playing');
-                return;
-            }
-
-            // Check if the selected track is in the queue, if so, skip to it
-            const trackIndex = next_tracks.findIndex(track => track.uri === trackUri);
-            if (trackIndex !== -1) {
-                player.skipToNext().then(() => {
-                    console.log('Skipping to the next track');
-                    player.seek(0).then(() => {
-                        console.log('Seeking to the beginning of the track');
-                    });
-                });
-            } else {
-                // If the selected track is not in the queue, add it and play
-                player.addToQueue(trackUri).then(() => {
-                    console.log('Track added to queue');
-                    player.skipToNext().then(() => {
-                        console.log('Skipping to the next track');
-                        player.seek(0).then(() => {
-                            console.log('Seeking to the beginning of the track');
-                        });
-                    });
-                });
-            }
-        });
-    }
+  var audio = new Audio(trackUri);
+  audio.play();
 }
 </script>
+
+
 </body>
 </html>
