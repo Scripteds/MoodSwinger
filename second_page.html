@@ -14,7 +14,9 @@
 
 <h1>Spotify API Mood Search</h1>
 <div id="results-container">
-    <div id="results"></div>
+    <h2>Random User Playlist:</h2>
+    <h3 id="playlist-name"></h3>
+    <div id="playlist-tracks"></div>
 </div>
 <button id="logout-button">Logout</button>
 <button id="play-button">Play</button>
@@ -93,9 +95,10 @@ function getAndDisplayPlaylist() {
 
     getRandomUserPlaylist(accessToken).then(playlist => {
         if (playlist) {
+            $("#playlist-name").text(playlist.name); // Display playlist name
             getPlaylistItems(accessToken, playlist.id).then(tracks => {
                 if (tracks) {
-                    displayPlaylist(playlist, tracks);
+                    displayPlaylist(tracks);
                 } else {
                     alert("No tracks found in the playlist.");
                 }
@@ -142,26 +145,28 @@ function getPlaylistItems(accessToken, playlistId) {
         }
     }).then(response => {
         // Extract tracks from the response
-        return response.items.map(item => item.track.uri);
+        return response.items.map(item => item.track);
     }).catch(error => {
         console.error('Error fetching playlist tracks:', error);
         return null;
     });
 }
 
-function displayPlaylist(playlist, tracks) {
-    var playlistHtml = '<h2>Random User Playlist:</h2>';
-    playlistHtml += `<h3>${playlist.name}</h3>`;
+function displayPlaylist(tracks) {
+    var playlistHtml = '';
     
     if (tracks.length > 0) {
-        tracks.forEach(function(uri) {
-            playlistHtml += `<iframe src="https://open.spotify.com/embed/track/${uri}" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+        tracks.forEach(function(track) {
+            playlistHtml += `<div class="track">`;
+            playlistHtml += `<p>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</p>`;
+            playlistHtml += `<a href="${track.external_urls.spotify}" target="_blank">Listen on Spotify</a>`;
+            playlistHtml += `</div>`;
         });
     } else {
         playlistHtml += '<p>No tracks found in the playlist.</p>';
     }
     
-    $("#results").html(playlistHtml);
+    $("#playlist-tracks").html(playlistHtml);
 }
 </script>
 </body>
