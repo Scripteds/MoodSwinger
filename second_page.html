@@ -58,7 +58,7 @@ function getAndDisplayPlaylist() {
 
     getRandomUserPlaylist(accessToken).then(playlist => {
         if (playlist) {
-            getPlaylistTracks(accessToken, playlist.id).then(tracks => {
+            getPlaylistItems(accessToken, playlist.id).then(tracks => {
                 if (tracks) {
                     displayPlaylist(playlist, tracks);
                 } else {
@@ -96,7 +96,7 @@ function getRandomUserPlaylist(accessToken) {
     });
 }
 
-function getPlaylistTracks(accessToken, playlistId) {
+function getPlaylistItems(accessToken, playlistId) {
     var apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
     return $.ajax({
