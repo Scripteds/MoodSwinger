@@ -100,8 +100,6 @@ function searchRecommendedTracks(mood, accessToken, offset = 0) {
                 if (response.tracks.length < 7) {
                     // If less than 7 tracks returned, search again with increased offset
                     searchRecommendedTracks(mood, accessToken, offset + response.tracks.length);
-                } else {
-                    createPlaylist(accessToken, response.tracks); // Create a playlist
                 }
             } else {
                 console.error("Error: Invalid response from Spotify API");
@@ -112,7 +110,6 @@ function searchRecommendedTracks(mood, accessToken, offset = 0) {
         }
     });
 }
-
 
 function displayResults(data) {
     var tracks = data.tracks;
@@ -140,54 +137,6 @@ function displayResults(data) {
 
     // Store search results in sessionStorage
     sessionStorage.setItem('searchResults', html);
-}
-
-
-function createPlaylist(accessToken, tracks) {
-    // Playlist data
-    var playlistData = {
-        "name": "Mood Swinger",
-        "description": "Your Current Mood",
-        "public": true,
-        "user_id": "31f2nfbjmzx5n7o3uimvhp46edli" // User ID
-    };
-
-    $.ajax({
-        url: "https://api.spotify.com/v1/users/31f2nfbjmzx5n7o3uimvhp46edli/playlists",
-        type: "POST",
-        headers: {
-            "Authorization": "Bearer " + accessToken,
-            "Content-Type": "application/json"
-        },
-        data: JSON.stringify(playlistData),
-        success: function(response) {
-            var playlistId = response.id;
-            addTracksToPlaylist(accessToken, playlistId, tracks);
-        },
-        error: function(xhr, status, error) {
-            console.log(error);
-        }
-    });
-}
-
-function addTracksToPlaylist(accessToken, playlistId, tracks) {
-    var trackUris = tracks.map(track => "spotify:track:" + track.id);
-
-    $.ajax({
-        url: "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks",
-        type: "POST",
-        headers: {
-            "Authorization": "Bearer " + accessToken,
-            "Content-Type": "application/json"
-        },
-        data: JSON.stringify({ "uris": trackUris }),
-        success: function(response) {
-            console.log("Playlist created and tracks added successfully!");
-        },
-        error: function(xhr, status, error) {
-            console.log(error);
-        }
-    });
 }
 
 function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
