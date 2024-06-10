@@ -6,6 +6,12 @@
     <title>Spotify API Mood Search</title>
     <link rel="stylesheet" href="second_page.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #spotify-iframe {
+            display: none;
+            border-radius: 12px;
+        }
+    </style>
 </head>
 <body>
 
@@ -25,6 +31,9 @@
 
 <button id="logout-button">Logout</button>
 
+<!-- Embedded Spotify playlist iframe -->
+<iframe id="spotify-iframe" src="https://open.spotify.com/embed/playlist/6x8sYhDC4opdbXAWwBVM51?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+
 <script>
 $(document).ready(function() {
     // Attach event listener to logout button
@@ -32,6 +41,9 @@ $(document).ready(function() {
         // Redirect to index.html
         window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
+
+    // Show the Spotify iframe once the page has loaded
+    $("#spotify-iframe").show();
 
     // Retrieve stored search results and selected mood from sessionStorage
     const storedResults = sessionStorage.getItem('searchResults');
