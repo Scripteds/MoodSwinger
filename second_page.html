@@ -40,34 +40,6 @@ $(document).ready(function() {
     if (storedResults && selectedMood) {
         $('#results').html(storedResults);
     }
-
-    // Retrieve access token from sessionStorage
-    var accessToken = sessionStorage.getItem('accessToken');
-
-    if (!accessToken) {
-        // If access token is not found, redirect to login page or handle it accordingly
-        console.log("Access token not found in sessionStorage.");
-        return;
-    }
-
-    // Fetch user info from Spotify API using the access token
-    $.ajax({
-        url: "https://api.spotify.com/v1/me",
-        type: "GET",
-        headers: {
-            "Authorization": "Bearer " + accessToken
-        },
-        success: function(response) {
-            const spotifyUsername = response.display_name;
-            const spotifyUserId = response.id;
-            // Display Spotify user info
-            console.log("Spotify Username:", spotifyUsername);
-            console.log("Spotify User ID:", spotifyUserId);
-        },
-        error: function(xhr, status, error) {
-            console.log("Error fetching user info:", error);
-        }
-    });
 });
 
 function searchSongs(mood) {
@@ -81,9 +53,6 @@ function searchSongs(mood) {
     };
 
     var selectedGenre = moodToGenre[mood];
-
-    // Store selected mood in sessionStorage
-    sessionStorage.setItem('selectedMood', selectedGenre);
 
     // Client ID and Client Secret
     var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
@@ -126,12 +95,11 @@ function searchRecommendedTracks(mood, accessToken) {
             "Authorization": "Bearer " + accessToken
         },
         success: function(response) {
-           if (response && response.tracks) {
-    createPlaylist(); // Call the function to create playlist
-    // You can add tracks to the playlist here if needed
-} else {
-    console.error("Error: Invalid response from Spotify API");
-}
+            if (response && response.tracks) {
+                displayResults(response); // Display the recommended tracks
+            } else {
+                console.error("Error: Invalid response from Spotify API");
+            }
         },
         error: function(xhr, status, error) {
             console.log(error);
@@ -139,38 +107,6 @@ function searchRecommendedTracks(mood, accessToken) {
     });
 }
 
-function createPlaylist() {
-    var accessToken = sessionStorage.getItem('accessToken');
-
-    // Check if access token is available
-    if (!accessToken) {
-        console.log("Access token not found.");
-        return;
-    }
-
-    $.ajax({
-        url: "https://api.spotify.com/v1/users/31f2nfbjmzx5n7o3uimvhp46edli/playlists",
-        type: "POST",
-        headers: {
-            "Authorization": "Bearer " + accessToken,
-            "Content-Type": "application/json"
-        },
-        data: JSON.stringify({
-            "name": "Mood Swinger",
-            "description": "Your Current Mood",
-            "public": true
-        }),
-        success: function(response) {
-            console.log("Playlist created successfully:", response);
-            // Once playlist is created, you can add tracks to it if needed
-        },
-        error: function(xhr, status, error) {
-            console.log("Error creating playlist:", error);
-        }
-    });
-}
-
-    
 function displayResults(data) {
     var tracks = data.tracks;
     var html = "<h2>Recommended Tracks</h2>";
@@ -185,7 +121,7 @@ function displayResults(data) {
         var spotifyUrl = "https://open.spotify.com/track/" + trackId;
         if (previewUrl) {
             html += "<div class='track'>";
-            html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
+            html += '<p><a href="#" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
             html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
             html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
             html += "</div>";
