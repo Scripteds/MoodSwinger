@@ -41,12 +41,14 @@ $(document).ready(function() {
     $('#results').html(storedResults);
   }
 
-  // Retrieve Spotify username from URL
+  // Retrieve Spotify username and user ID from URL
   const urlParams = new URLSearchParams(window.location.search);
   const spotifyUsername = urlParams.get('spotify_username');
-  if (spotifyUsername) {
-    // Do something with the Spotify username
+  const spotifyUserId = urlParams.get('user_id');
+  if (spotifyUsername && spotifyUserId) {
+    // Display Spotify user ID in the console
     console.log("Spotify Username:", spotifyUsername);
+    console.log("Spotify User ID:", spotifyUserId);
   }
 });
 
