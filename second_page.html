@@ -139,6 +139,12 @@ function createPlaylistAndAddTracks(tracks) {
     var playlistName = "New Playlist";
     var accessToken = sessionStorage.getItem('accessToken');
 
+    // Check if access token is available
+    if (!accessToken) {
+        console.log("Access token not found.");
+        return;
+    }
+
     $.ajax({
         url: "https://api.spotify.com/v1/me/playlists",
         type: "POST",
@@ -179,6 +185,7 @@ function createPlaylistAndAddTracks(tracks) {
         }
     });
 }
+
 
 
 function displayResults(data) {
