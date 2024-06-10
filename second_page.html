@@ -6,12 +6,6 @@
     <title>Spotify API Mood Search</title>
     <link rel="stylesheet" href="second_page.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        #spotify-iframe {
-            display: none;
-            border-radius: 12px;
-        }
-    </style>
 </head>
 <body>
 
@@ -31,9 +25,6 @@
 
 <button id="logout-button">Logout</button>
 
-<!-- Embedded Spotify playlist iframe -->
-<iframe id="spotify-iframe" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-
 <script>
 $(document).ready(function() {
     // Attach event listener to logout button
@@ -41,9 +32,6 @@ $(document).ready(function() {
         // Redirect to index.html
         window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
-
-    // Show the Spotify iframe once the page has loaded
-    $("#spotify-iframe").show();
 
     // Retrieve stored search results and selected mood from sessionStorage
     const storedResults = sessionStorage.getItem('searchResults');
@@ -70,9 +58,6 @@ $(document).ready(function() {
                 // Display Spotify user info
                 console.log("Spotify Username:", spotifyUsername);
                 console.log("Spotify User ID:", spotifyUserId);
-                
-                // Create playlist for the user
-                createPlaylist(spotifyUserId, accessToken);
             },
             error: function(xhr, status, error) {
                 console.log("Error fetching user info:", error);
@@ -140,7 +125,6 @@ function searchRecommendedTracks(mood, accessToken) {
     success: function(response) {
         if (response && response.tracks) {
             displayResults(response);
-            // createPlaylist is called here so that playlist is created after getting recommended tracks
         } else {
             console.error("Error: Invalid response from Spotify API");
         }
@@ -177,34 +161,6 @@ function displayResults(data) {
 
     // Store search results in sessionStorage
     sessionStorage.setItem('searchResults', html);
-}
-
-function createPlaylist(userId, accessToken) {
-    var playlistName = "Mood Playlist";
-    var isPublic = true;
-
-    // Request to create playlist
-    $.ajax({
-        url: "https://api.spotify.com/v1/users/" + userId + "/playlists",
-        type: "POST",
-        headers: {
-            "Authorization": "Bearer " + accessToken,
-            "Content-Type": "application/json"
-        },
-        data: JSON.stringify({
-            "name": playlistName,
-            "public": isPublic
-        }),
-        success: function(playlistResponse) {
-            var playlistId = playlistResponse.id;
-            console.log("Playlist created successfully. ID:", playlistId);
-            // Embed the playlist in the iframe
-            $("#spotify-iframe").attr("src", "https://open.spotify.com/embed/playlist/" + playlistId);
-        },
-        error: function(xhr, status, error) {
-            console.log(error);
-        }
-    });
 }
 
 function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
