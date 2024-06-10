@@ -200,8 +200,19 @@ $(document).ready(function() {
 });
 
 function searchSongs(mood) {
+  // Map moods to Spotify seed genres
+  var moodToGenre = {
+    'happy': 'happy',
+    'sad': 'sad',
+    'disgust': 'alternative',
+    'fear': 'dark',
+    'anger': 'metal'
+  };
+
+  var selectedGenre = moodToGenre[mood];
+
   // Store selected mood in sessionStorage
-  sessionStorage.setItem('selectedMood', mood);
+  sessionStorage.setItem('selectedMood', selectedGenre);
 
   // Client ID and Client Secret
   var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
@@ -219,13 +230,14 @@ function searchSongs(mood) {
     },
     success: function(response) {
       var accessToken = response.access_token;
-      searchRecommendedTracks(mood, accessToken);
+      searchRecommendedTracks(selectedGenre, accessToken);
     },
     error: function(xhr, status, error) {
       console.log(error);
     }
   });
 }
+
 
 function searchRecommendedTracks(mood, accessToken) {
   // Use Spotify's recommendation API to get recommended tracks based on mood
