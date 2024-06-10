@@ -43,12 +43,26 @@ $(document).ready(function() {
 
   // Retrieve Spotify username and user ID from URL
   const urlParams = new URLSearchParams(window.location.search);
-  const spotifyUsername = urlParams.get('spotify_username');
-  const spotifyUserId = urlParams.get('user_id');
-  if (spotifyUsername && spotifyUserId) {
-    // Display Spotify user ID in the console
-    console.log("Spotify Username:", spotifyUsername);
-    console.log("Spotify User ID:", spotifyUserId);
+  const accessToken = urlParams.get('access_token');
+  if (accessToken) {
+    // Fetch user info from Spotify API
+    $.ajax({
+      url: "https://api.spotify.com/v1/me",
+      type: "GET",
+      headers: {
+        "Authorization": "Bearer " + accessToken
+      },
+      success: function(response) {
+        const spotifyUsername = response.display_name;
+        const spotifyUserId = response.id;
+        // Display Spotify user info
+        console.log("Spotify Username:", spotifyUsername);
+        console.log("Spotify User ID:", spotifyUserId);
+      },
+      error: function(xhr, status, error) {
+        console.log("Error fetching user info:", error);
+      }
+    });
   }
 });
 
