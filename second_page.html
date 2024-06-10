@@ -108,31 +108,75 @@ function searchSongs(mood) {
 }
   
 function searchRecommendedTracks(mood, accessToken) {
-  // Use Spotify's recommendation API to get recommended tracks based on mood
-  var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=5";
+    // Use Spotify's recommendation API to get recommended tracks based on mood
+    var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=5";
 
-  if (!accessToken) {
-    console.log("Access token not available.");
-    return;
-  }
-
-  $.ajax({
-    url: apiUrl,
-    type: "GET",
-    headers: {
-      "Authorization": "Bearer " + accessToken
-    },
-    success: function(response) {
-        if (response && response.tracks) {
-            displayResults(response);
-        } else {
-            console.error("Error: Invalid response from Spotify API");
-        }
-    },
-    error: function(xhr, status, error) {
-        console.log(error);
+    if (!accessToken) {
+        console.log("Access token not available.");
+        return;
     }
-  });
+
+    $.ajax({
+        url: apiUrl,
+        type: "GET",
+        headers: {
+            "Authorization": "Bearer " + accessToken
+        },
+        success: function(response) {
+            if (response && response.tracks) {
+                createPlaylistAndAddTracks(response.tracks);
+            } else {
+                console.error("Error: Invalid response from Spotify API");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+        }
+    });
+}
+
+function createPlaylistAndAddTracks(tracks) {
+    var playlistName = "Current Moode"; // Playlist name
+    var accessToken = sessionStorage.getItem('accessToken');
+
+    $.ajax({
+        url: "https://api.spotify.com/v1/me/playlists",
+        type: "POST",
+        headers: {
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json"
+        },
+        data: JSON.stringify({
+            "name": playlistName,
+            "public": true
+        }),
+        success: function(playlistResponse) {
+            var playlistId = playlistResponse.id;
+            var trackUris = tracks.map(track => "spotify:track:" + track.id);
+
+            // Add tracks to the created playlist
+            $.ajax({
+                url: "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks",
+                type: "POST",
+                headers: {
+                    "Authorization": "Bearer " + accessToken,
+                    "Content-Type": "application/json"
+                },
+                data: JSON.stringify({
+                    "uris": trackUris
+                }),
+                success: function(response) {
+                    console.log("Playlist created and tracks added successfully!");
+                },
+                error: function(xhr, status, error) {
+                    console.log("Error adding tracks to playlist:", error);
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.log("Error creating playlist:", error);
+        }
+    });
 }
 
 function displayResults(data) {
