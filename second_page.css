@@ -1,0 +1,155 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Heading style */
+h1 {
+  color: #1db954;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Image container */
+.image-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Mood image style */
+.mood-image {
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: transform 0.3s, border-color 0.3s;
+}
+
+.mood-image:hover {
+  transform: scale(1.1);
+  border-color: #1db954;
+}
+
+/* Track details container */
+.track-details {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Track title */
+.track-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Artist name and release year */
+.artist-release {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+/* Spotify embed style */
+iframe {
+  width: 100%;
+  height: 300px;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Results container style */
+#results-container {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Tracks container style */
+.tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Individual track style */
+.track {
+  padding: 15px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px; /* Increased max-width for larger display */
+}
+
+.track p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.track a {
+  display: block;
+  margin-top: 10px;
+  color: #1db954;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.track a:hover {
+  text-decoration: underline;
+}
+
+/* Logout button style */
+#logout-button {
+  display: block;
+  margin: 30px auto;
+  padding: 10px 20px;
+  background-color: #ff3b3b;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+#logout-button:hover {
+  background-color: #ff5e5e;
+}
+
+/* Back button style */
+#back-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #555;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+#back-button:hover {
+  background-color: #777;
+}
