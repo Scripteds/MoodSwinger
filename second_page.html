@@ -42,30 +42,32 @@ $(document).ready(function() {
     }
 
     // Retrieve access token from sessionStorage
-    const accessToken = sessionStorage.getItem('accessToken');
+    var accessToken = sessionStorage.getItem('accessToken');
 
-    if (accessToken) {
-        // Fetch user info from Spotify API using the access token
-        $.ajax({
-            url: "https://api.spotify.com/v1/me",
-            type: "GET",
-            headers: {
-                "Authorization": "Bearer " + accessToken
-            },
-            success: function(response) {
-                const spotifyUsername = response.display_name;
-                const spotifyUserId = response.id;
-                // Display Spotify user info
-                console.log("Spotify Username:", spotifyUsername);
-                console.log("Spotify User ID:", spotifyUserId);
-            },
-            error: function(xhr, status, error) {
-                console.log("Error fetching user info:", error);
-            }
-        });
-    } else {
+    if (!accessToken) {
+        // If access token is not found, redirect to login page or handle it accordingly
         console.log("Access token not found in sessionStorage.");
+        return;
     }
+
+    // Fetch user info from Spotify API using the access token
+    $.ajax({
+        url: "https://api.spotify.com/v1/me",
+        type: "GET",
+        headers: {
+            "Authorization": "Bearer " + accessToken
+        },
+        success: function(response) {
+            const spotifyUsername = response.display_name;
+            const spotifyUserId = response.id;
+            // Display Spotify user info
+            console.log("Spotify Username:", spotifyUsername);
+            console.log("Spotify User ID:", spotifyUserId);
+        },
+        error: function(xhr, status, error) {
+            console.log("Error fetching user info:", error);
+        }
+    });
 });
 
 function searchSongs(mood) {
@@ -99,6 +101,7 @@ function searchSongs(mood) {
         },
         success: function(response) {
             var accessToken = response.access_token;
+            sessionStorage.setItem('accessToken', accessToken); // Store access token
             searchRecommendedTracks(selectedGenre, accessToken);
         },
         error: function(xhr, status, error) {
