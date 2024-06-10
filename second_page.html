@@ -79,7 +79,7 @@ function searchSongs(mood) {
     });
 }
 
-function searchRecommendedTracks(mood, accessToken, offset = 0) {
+function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTracks = []) {
     // Use Spotify's recommendation API to get recommended tracks based on mood
     var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=7&offset=" + offset; // Change limit to 7
 
@@ -96,10 +96,12 @@ function searchRecommendedTracks(mood, accessToken, offset = 0) {
         },
         success: function(response) {
             if (response && response.tracks) {
-                displayResults(response); // Display the recommended tracks
-                if (response.tracks.length < 7) {
-                    // If less than 7 tracks returned, search again with increased offset
-                    searchRecommendedTracks(mood, accessToken, offset + response.tracks.length);
+                accumulatedTracks = accumulatedTracks.concat(response.tracks);
+                if (accumulatedTracks.length < 7) {
+                    // If less than 7 tracks accumulated, search again with increased offset
+                    searchRecommendedTracks(mood, accessToken, offset + response.tracks.length, accumulatedTracks);
+                } else {
+                    displayResults(accumulatedTracks.slice(0, 7)); // Display the first 7 tracks
                 }
             } else {
                 console.error("Error: Invalid response from Spotify API");
@@ -111,8 +113,7 @@ function searchRecommendedTracks(mood, accessToken, offset = 0) {
     });
 }
 
-function displayResults(data) {
-    var tracks = data.tracks;
+function displayResults(tracks) {
     var html = "<h2>Recommended Tracks</h2>";
     html += "<div class='tracks'>";
     var count = 0;
