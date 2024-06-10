@@ -100,6 +100,28 @@
             }
             return accessToken;
         }
+
+        // Function to get Spotify user info
+        function getSpotifyUserInfo(accessToken) {
+            $.ajax({
+                url: "https://api.spotify.com/v1/me",
+                type: "GET",
+                headers: {
+                    "Authorization": "Bearer " + accessToken
+                },
+                success: function(response) {
+                    var spotifyUsername = response.display_name;
+                    var spotifyUserId = response.id;
+                    // Store Spotify username and user ID in sessionStorage
+                    sessionStorage.setItem('spotifyUsername', spotifyUsername);
+                    sessionStorage.setItem('spotifyUserId', spotifyUserId);
+                    // Redirect to the main page or do other actions if needed
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching Spotify user info:", error);
+                }
+            });
+        }
     </script>
 </body>
 </html>
