@@ -81,7 +81,7 @@ function searchSongs(mood) {
 
 function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTracks = []) {
     // Use Spotify's recommendation API to get recommended tracks based on mood
-    var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=7&offset=" + offset; // Change limit to 7
+    var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=70&offset=" + offset; // Change limit to 7
 
     if (!accessToken) {
         console.log("Access token not available.");
