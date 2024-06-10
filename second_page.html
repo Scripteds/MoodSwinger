@@ -40,6 +40,14 @@ $(document).ready(function() {
   if (storedResults && selectedMood) {
     $('#results').html(storedResults);
   }
+
+  // Retrieve Spotify username from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const spotifyUsername = urlParams.get('spotify_username');
+  if (spotifyUsername) {
+    // Do something with the Spotify username
+    console.log("Spotify Username:", spotifyUsername);
+  }
 });
 
 function searchSongs(mood) {
