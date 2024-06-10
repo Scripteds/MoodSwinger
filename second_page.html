@@ -141,11 +141,12 @@ function createPlaylist(accessToken, tracks) {
     var playlistData = {
         "name": "Mood Swinger",
         "description": "Your Current Mood",
-        "public": true
+        "public": true,
+        "user_id": "31f2nfbjmzx5n7o3uimvhp46edli" // User ID
     };
 
     $.ajax({
-        url: "https://api.spotify.com/v1/me/playlists",
+        url: "https://api.spotify.com/v1/users/31f2nfbjmzx5n7o3uimvhp46edli/playlists",
         type: "POST",
         headers: {
             "Authorization": "Bearer " + accessToken,
@@ -188,6 +189,7 @@ function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
     sessionStorage.setItem('artistName', artistName);
     sessionStorage.setItem('releaseYear', releaseYear);
 }
+
 </script>
 
 </body>
