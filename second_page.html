@@ -41,7 +41,7 @@ $(document).ready(function() {
     $('#results').html(storedResults);
   }
 
-  // Retrieve Spotify username and user ID from URL
+   // Retrieve Spotify username and user ID from URL
   const urlParams = new URLSearchParams(window.location.search);
   const accessToken = urlParams.get('access_token');
   if (accessToken) {
@@ -63,6 +63,8 @@ $(document).ready(function() {
         console.log("Error fetching user info:", error);
       }
     });
+  } else {
+    console.log("Access token not found in URL parameters.");
   }
 });
 
