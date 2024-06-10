@@ -73,7 +73,7 @@
             <img src="anger.png" alt="Anger" class="mood" width="100" height="100">
         </div>
         <br><br>
-        <a href="https://accounts.spotify.com/authorize?client_id=a80fcf0c3aae4aabb6f6b6721183b72e&response_type=code&redirect_uri=https://scripteds.github.io/MoodSwinger/second_page.html&scope=user-read-private%20user-read-email&state=STATE&show_dialog=true" class="spotify-login-btn">Login with Spotify</a>
+        <a href="https://accounts.spotify.com/authorize?client_id=a80fcf0c3aae4aabb6f6b6721183b72e&response_type=token&redirect_uri=https://scripteds.github.io/MoodSwinger/second_page.html&scope=user-read-private%20user-read-email&state=STATE&show_dialog=true" class="spotify-login-btn">Login with Spotify</a>
     </div>
 
     <script>
@@ -81,8 +81,11 @@
         window.addEventListener("load", function() {
             var accessToken = getAccessTokenFromURL();
             if (accessToken) {
-                // If access token is present, redirect to the second page
-                window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html?access_token=" + accessToken;
+                // If access token is present, store it in sessionStorage
+                sessionStorage.setItem('accessToken', accessToken);
+                // Redirect to the main page or perform other actions
+                // Here, you might want to redirect to the main page
+                window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html";
             }
         });
 
@@ -99,28 +102,6 @@
                 }
             }
             return accessToken;
-        }
-
-        // Function to get Spotify user info
-        function getSpotifyUserInfo(accessToken) {
-            $.ajax({
-                url: "https://api.spotify.com/v1/me",
-                type: "GET",
-                headers: {
-                    "Authorization": "Bearer " + accessToken
-                },
-                success: function(response) {
-                    var spotifyUsername = response.display_name;
-                    var spotifyUserId = response.id;
-                    // Store Spotify username and user ID in sessionStorage
-                    sessionStorage.setItem('spotifyUsername', spotifyUsername);
-                    sessionStorage.setItem('spotifyUserId', spotifyUserId);
-                    // Redirect to the main page or do other actions if needed
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error fetching Spotify user info:", error);
-                }
-            });
         }
     </script>
 </body>
