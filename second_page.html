@@ -1,113 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spotify API Mood Search</title>
-<link rel="stylesheet" href="second_page.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify API Mood Search</title>
+    <link rel="stylesheet" href="second_page.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 
 <h1>Spotify API Mood Search</h1>
 
 <div class="image-container">
-  <img src="happy.png" alt="Happy" class="mood-image" onclick="searchSongs('happy')">
-  <img src="sad.png" alt="Sad" class="mood-image" onclick="searchSongs('sad')">
-  <img src="disgust.png" alt="Disgust" class="mood-image" onclick="searchSongs('disgust')">
-  <img src="fear.png" alt="Fear" class="mood-image" onclick="searchSongs('fear')">
-  <img src="anger.png" alt="Anger" class="mood-image" onclick="searchSongs('anger')">
+    <img src="happy.png" alt="Happy" class="mood-image" onclick="searchSongs('happy')">
+    <img src="sad.png" alt="Sad" class="mood-image" onclick="searchSongs('sad')">
+    <img src="disgust.png" alt="Disgust" class="mood-image" onclick="searchSongs('disgust')">
+    <img src="fear.png" alt="Fear" class="mood-image" onclick="searchSongs('fear')">
+    <img src="anger.png" alt="Anger" class="mood-image" onclick="searchSongs('anger')">
 </div>
 
 <div id="results-container">
-  <div id="results"></div>
+    <div id="results"></div>
 </div>
 
 <button id="logout-button">Logout</button>
 
 <script>
 $(document).ready(function() {
-  // Attach event listener to logout button
-  $("#logout-button").click(function() {
-    // Redirect to index.html
-    window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-  });
-
-  // Retrieve stored search results and selected mood from sessionStorage
-  const storedResults = sessionStorage.getItem('searchResults');
-  const selectedMood = sessionStorage.getItem('selectedMood');
-
-  if (storedResults && selectedMood) {
-    $('#results').html(storedResults);
-  }
-
-   // Retrieve Spotify username and user ID from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const accessToken = urlParams.get('access_token');
-  if (accessToken) {
-    // Fetch user info from Spotify API
-    $.ajax({
-      url: "https://api.spotify.com/v1/me",
-      type: "GET",
-      headers: {
-        "Authorization": "Bearer " + accessToken
-      },
-      success: function(response) {
-        const spotifyUsername = response.display_name;
-        const spotifyUserId = response.id;
-        // Display Spotify user info
-        console.log("Spotify Username:", spotifyUsername);
-        console.log("Spotify User ID:", spotifyUserId);
-      },
-      error: function(xhr, status, error) {
-        console.log("Error fetching user info:", error);
-      }
+    // Attach event listener to logout button
+    $("#logout-button").click(function() {
+        // Redirect to index.html
+        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
-  } else {
-    console.log("Access token not found in URL parameters.");
-  }
+
+    // Retrieve stored search results and selected mood from sessionStorage
+    const storedResults = sessionStorage.getItem('searchResults');
+    const selectedMood = sessionStorage.getItem('selectedMood');
+
+    if (storedResults && selectedMood) {
+        $('#results').html(storedResults);
+    }
+
+    // Retrieve access token from sessionStorage
+    const accessToken = sessionStorage.getItem('accessToken');
+
+    if (accessToken) {
+        // Fetch user info from Spotify API using the access token
+        $.ajax({
+            url: "https://api.spotify.com/v1/me",
+            type: "GET",
+            headers: {
+                "Authorization": "Bearer " + accessToken
+            },
+            success: function(response) {
+                const spotifyUsername = response.display_name;
+                const spotifyUserId = response.id;
+                // Display Spotify user info
+                console.log("Spotify Username:", spotifyUsername);
+                console.log("Spotify User ID:", spotifyUserId);
+            },
+            error: function(xhr, status, error) {
+                console.log("Error fetching user info:", error);
+            }
+        });
+    } else {
+        console.log("Access token not found in sessionStorage.");
+    }
 });
 
-
 function searchSongs(mood) {
-  // Map moods to Spotify seed genres
-  var moodToGenre = {
-    'happy': 'happy',
-    'sad': 'sad',
-    'disgust': 'alternative',
-    'fear': 'ambient',
-    'anger': 'metal'
-  };
+    // Map moods to Spotify seed genres
+    var moodToGenre = {
+        'happy': 'happy',
+        'sad': 'sad',
+        'disgust': 'alternative',
+        'fear': 'ambient',
+        'anger': 'metal'
+    };
 
-  var selectedGenre = moodToGenre[mood];
+    var selectedGenre = moodToGenre[mood];
 
-  // Store selected mood in sessionStorage
-  sessionStorage.setItem('selectedMood', selectedGenre);
+    // Store selected mood in sessionStorage
+    sessionStorage.setItem('selectedMood', selectedGenre);
 
-  // Client ID and Client Secret
-  var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
-  var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
+    // Client ID and Client Secret
+    var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
+    var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
 
-  // Request access token
-  $.ajax({
-    url: "https://accounts.spotify.com/api/token",
-    type: "POST",
-    headers: {
-      "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
-    },
-    data: {
-      "grant_type": "client_credentials"
-    },
-    success: function(response) {
-      var accessToken = response.access_token;
-      searchRecommendedTracks(selectedGenre, accessToken);
-    },
-    error: function(xhr, status, error) {
-      console.log(error);
-    }
-  });
+    // Request access token
+    $.ajax({
+        url: "https://accounts.spotify.com/api/token",
+        type: "POST",
+        headers: {
+            "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
+        },
+        data: {
+            "grant_type": "client_credentials"
+        },
+        success: function(response) {
+            var accessToken = response.access_token;
+            searchRecommendedTracks(selectedGenre, accessToken);
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+        }
+    });
 }
-
+  
 function searchRecommendedTracks(mood, accessToken) {
   // Use Spotify's recommendation API to get recommended tracks based on mood
   var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=5";
