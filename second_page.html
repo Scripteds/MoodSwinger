@@ -83,7 +83,7 @@ function searchSongs(mood) {
 
 function searchRecommendedTracks(mood, accessToken) {
   // Use Spotify's recommendation API to get recommended tracks based on mood
-  var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=50";
+  var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=5";
 
   if (!accessToken) {
     console.log("Access token not available.");
@@ -147,8 +147,12 @@ function createPlaylist(tracks, accessToken) {
       var playlistName = "Mood Playlist";
       var isPublic = true;
 
+      console.log("User ID:", userId);
+
       // Prepare track URIs
       var trackURIs = tracks.map(track => "spotify:track:" + track.id);
+
+      console.log("Track URIs:", trackURIs);
 
       // Create playlist
       $.ajax({
@@ -164,6 +168,7 @@ function createPlaylist(tracks, accessToken) {
         }),
         success: function(playlistResponse) {
           var playlistId = playlistResponse.id;
+          console.log("Playlist created successfully. ID:", playlistId);
           addTracksToPlaylist(playlistId, trackURIs, accessToken);
         },
         error: function(xhr, status, error) {
