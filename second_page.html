@@ -32,7 +32,7 @@
 <button id="logout-button">Logout</button>
 
 <!-- Embedded Spotify playlist iframe -->
-<iframe id="spotify-iframe" src="https://open.spotify.com/embed/playlist/6x8sYhDC4opdbXAWwBVM51?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<iframe id="spotify-iframe" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 
 <script>
 $(document).ready(function() {
@@ -70,6 +70,9 @@ $(document).ready(function() {
                 // Display Spotify user info
                 console.log("Spotify Username:", spotifyUsername);
                 console.log("Spotify User ID:", spotifyUserId);
+                
+                // Create playlist for the user
+                createPlaylist(spotifyUserId, accessToken);
             },
             error: function(xhr, status, error) {
                 console.log("Error fetching user info:", error);
@@ -135,122 +138,80 @@ function searchRecommendedTracks(mood, accessToken) {
       "Authorization": "Bearer " + accessToken
     },
     success: function(response) {
-  if (response && response.tracks) {
-    displayResults(response);
-    createPlaylist(response.tracks, accessToken);
-  } else {
-    console.error("Error: Invalid response from Spotify API");
-  }
-},
-
+        if (response && response.tracks) {
+            displayResults(response);
+            // createPlaylist is called here so that playlist is created after getting recommended tracks
+        } else {
+            console.error("Error: Invalid response from Spotify API");
+        }
+    },
     error: function(xhr, status, error) {
-      console.log(error);
+        console.log(error);
     }
   });
 }
 
 function displayResults(data) {
-  var tracks = data.tracks;
-  var html = "<h2>Recommended Tracks</h2>";
-  html += "<div class='tracks'>";
-  var count = 0;
-  for (var i = 0; i < tracks.length && count < 5; i++) {
-    var trackName = tracks[i].name;
-    var trackId = tracks[i].id;
-    var artistName = tracks[i].artists[0].name;
-    var releaseYear = new Date(tracks[i].album.release_date).getFullYear();
-    var previewUrl = tracks[i].preview_url;
-    var spotifyUrl = "https://open.spotify.com/track/" + trackId;
-    if (previewUrl) {
-      html += "<div class='track'>";
-      html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
-      html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
-      html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
-      html += "</div>";
-      count++;
+    var tracks = data.tracks;
+    var html = "<h2>Recommended Tracks</h2>";
+    html += "<div class='tracks'>";
+    var count = 0;
+    for (var i = 0; i < tracks.length && count < 5; i++) {
+        var trackName = tracks[i].name;
+        var trackId = tracks[i].id;
+        var artistName = tracks[i].artists[0].name;
+        var releaseYear = new Date(tracks[i].album.release_date).getFullYear();
+        var previewUrl = tracks[i].preview_url;
+        var spotifyUrl = "https://open.spotify.com/track/" + trackId;
+        if (previewUrl) {
+            html += "<div class='track'>";
+            html += '<p><a href="https://scripteds.github.io/MoodSwinger/track.html" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
+            html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
+            html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
+            html += "</div>";
+            count++;
+        }
     }
-  }
-  html += "</div>";
-  $("#results").html(html);
+    html += "</div>";
+    $("#results").html(html);
 
-  // Store search results in sessionStorage
-  sessionStorage.setItem('searchResults', html);
+    // Store search results in sessionStorage
+    sessionStorage.setItem('searchResults', html);
 }
 
-function createPlaylist(tracks, accessToken) {
-  // Get user's Spotify user ID
-  $.ajax({
-    url: "https://api.spotify.com/v1/me",
-    type: "GET",
-    headers: {
-      "Authorization": "Bearer " + accessToken
-    },
-    success: function(response) {
-      var userId = response.id;
-      var playlistName = "Mood Playlist";
-      var isPublic = true;
+function createPlaylist(userId, accessToken) {
+    var playlistName = "Mood Playlist";
+    var isPublic = true;
 
-      console.log("User ID:", userId);
-
-      // Prepare track URIs
-      var trackURIs = tracks.map(track => "spotify:track:" + track.id);
-
-      console.log("Track URIs:", trackURIs);
-
-      // Create playlist
-      $.ajax({
+    // Request to create playlist
+    $.ajax({
         url: "https://api.spotify.com/v1/users/" + userId + "/playlists",
         type: "POST",
         headers: {
-          "Authorization": "Bearer " + accessToken,
-          "Content-Type": "application/json"
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json"
         },
         data: JSON.stringify({
-          "name": playlistName,
-          "public": isPublic
+            "name": playlistName,
+            "public": isPublic
         }),
         success: function(playlistResponse) {
-          var playlistId = playlistResponse.id;
-          console.log("Playlist created successfully. ID:", playlistId);
-          addTracksToPlaylist(playlistId, trackURIs, accessToken);
+            var playlistId = playlistResponse.id;
+            console.log("Playlist created successfully. ID:", playlistId);
+            // Embed the playlist in the iframe
+            $("#spotify-iframe").attr("src", "https://open.spotify.com/embed/playlist/" + playlistId);
         },
         error: function(xhr, status, error) {
-          console.log(error);
+            console.log(error);
         }
-      });
-    },
-    error: function(xhr, status, error) {
-      console.log(error);
-    }
-  });
-}
-
-function addTracksToPlaylist(playlistId, trackURIs, accessToken) {
-  // Add tracks to the created playlist
-  $.ajax({
-    url: "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks",
-    type: "POST",
-    headers: {
-      "Authorization": "Bearer " + accessToken,
-      "Content-Type": "application/json"
-    },
-    data: JSON.stringify({
-      "uris": trackURIs
-    }),
-    success: function(response) {
-      console.log("Tracks added to playlist successfully!");
-    },
-    error: function(xhr, status, error) {
-      console.log(error);
-    }
-  });
+    });
 }
 
 function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
-  sessionStorage.setItem('trackId', trackId);
-  sessionStorage.setItem('trackName', trackName);
-  sessionStorage.setItem('artistName', artistName);
-  sessionStorage.setItem('releaseYear', releaseYear);
+    sessionStorage.setItem('trackId', trackId);
+    sessionStorage.setItem('trackName', trackName);
+    sessionStorage.setItem('artistName', artistName);
+    sessionStorage.setItem('releaseYear', releaseYear);
 }
 </script>
 
