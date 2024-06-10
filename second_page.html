@@ -107,9 +107,14 @@ function searchRecommendedTracks(mood, accessToken) {
       "Authorization": "Bearer " + accessToken
     },
     success: function(response) {
-      displayResults(response);
-      createPlaylist(response.tracks, accessToken);
-    },
+  if (response && response.tracks) {
+    displayResults(response);
+    createPlaylist(response.tracks, accessToken);
+  } else {
+    console.error("Error: Invalid response from Spotify API");
+  }
+},
+
     error: function(xhr, status, error) {
       console.log(error);
     }
