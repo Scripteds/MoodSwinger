@@ -144,7 +144,7 @@ function displayResults(tracks) {
 
 function addTracksToPlaylist(tracks) {
     var trackUris = tracks.map(track => "spotify:track:" + track.id);
-    var playlistId = "2GZt3WkybIvFADu9ooHvU0";
+    var playlistId = "7Fn5SdMYGiqLK9rtTfv0OJ";
     var accessToken = sessionStorage.getItem('accessToken');
 
     if (!accessToken) {
@@ -171,6 +171,7 @@ function addTracksToPlaylist(tracks) {
         }
     });
 }
+
 
 
 function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
