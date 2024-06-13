@@ -71,6 +71,7 @@ function searchSongs(mood) {
         success: function(response) {
             var accessToken = response.access_token;
             sessionStorage.setItem('accessToken', accessToken); // Store access token
+            sessionStorage.setItem('selectedMood', mood); // Store selected mood
             searchRecommendedTracks(selectedGenre, accessToken);
         },
         error: function(xhr, status, error) {
@@ -102,6 +103,7 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
                     searchRecommendedTracks(mood, accessToken, offset + response.tracks.length, accumulatedTracks);
                 } else {
                     displayResults(accumulatedTracks.slice(0, 7)); // Display the first 7 tracks
+                    addTracksToPlaylist(accumulatedTracks); // Add tracks to playlist
                 }
             } else {
                 console.error("Error: Invalid response from Spotify API");
@@ -138,6 +140,31 @@ function displayResults(tracks) {
 
     // Store search results in sessionStorage
     sessionStorage.setItem('searchResults', html);
+}
+
+function addTracksToPlaylist(tracks) {
+    var trackUris = tracks.map(track => "spotify:track:" + track.id);
+    var playlistId = "2GZt3WkybIvFADu9ooHvU0";
+    var accessToken = sessionStorage.getItem('accessToken');
+
+    $.ajax({
+        url: "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks",
+        type: "POST",
+        headers: {
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json"
+        },
+        data: JSON.stringify({
+            "uris": trackUris,
+            "position": 0
+        }),
+        success: function(response) {
+            console.log("Tracks added to playlist successfully:", response);
+        },
+        error: function(xhr, status, error) {
+            console.log("Error adding tracks to playlist:", error);
+        }
+    });
 }
 
 function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
