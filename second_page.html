@@ -29,6 +29,9 @@
 $(document).ready(function() {
     // Attach event listener to logout button
     $("#logout-button").click(function() {
+        // Clear stored results and selected mood
+        sessionStorage.removeItem('searchResults');
+        sessionStorage.removeItem('selectedMood');
         // Redirect to index.html
         window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
@@ -117,30 +120,54 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
 
 function displayResults(tracks) {
     var html = "<h2>Recommended Tracks</h2>";
-    html += "<div class='tracks'>";
-    var count = 0;
-    for (var i = 0; i < tracks.length && count < 7; i++) { // Ensure count < 7
-        var trackName = tracks[i].name;
-        var trackId = tracks[i].id;
-        var artistName = tracks[i].artists[0].name;
-        var releaseYear = new Date(tracks[i].album.release_date).getFullYear();
-        var previewUrl = tracks[i].preview_url;
-        var spotifyUrl = "https://open.spotify.com/track/" + trackId;
-        if (previewUrl) {
-            html += "<div class='track'>";
-            html += '<p><a href="#" onclick="saveTrackDetails(\'' + trackId + '\', \'' + trackName + '\', \'' + artistName + '\', \'' + releaseYear + '\')">' + trackName + '</a></p>';
-            html += '<iframe src="https://open.spotify.com/embed/track/' + trackId + '" width="400" height="100" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>';
-            html += '<a href="' + spotifyUrl + '" target="_blank">Listen on Spotify</a>';
-            html += "</div>";
-            count++;
-        }
+
+    // Random number generator between 1 and 3
+    var randomNum = Math.floor(Math.random() * 3) + 1;
+
+    // Mood-specific iframes
+    var iframes = {
+        'happy': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/13ormTxG6AcdCR60Oill7u?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2HigI3Azhej6MNwwU0atkj?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/39kYnpQSmhXxTwn5GV0R18?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ],
+        'sad': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5Guz2vByBEoLUOXywvp3ya?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1el2aFJNMaBHd4FcQ6E9sb?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ],
+        'disgust': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4AfVA8ipKGHxj5SpKecEQ9?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0AnMFrSfpjkHzDaFzWrL93?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3j76k6yVIoTC8G6KdnsfV4?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ],
+        'fear': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/36nADxdAyR2bhEFEBGAfal?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6lBeyJxtwv6TbUgX7H5qXD?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1lpN3bZeXYYn3sRjz8Gp6A?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ],
+        'anger': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/7GVBZqYVpyavNcfvfK4yaY?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2wZObLqWJvahGbp7fgGGt7?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2GZt3WkybIvFADu9ooHvU0?utm_source=generator" width="100%" height="1000" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ]
+    };
+
+    // Get the selected mood from sessionStorage
+    const selectedMood = sessionStorage.getItem('selectedMood');
+    
+    if (selectedMood && iframes[selectedMood]) {
+        html += iframes[selectedMood][randomNum - 1];
+    } else {
+        html += "<p>No mood selected or no iframe found for the selected mood.</p>";
     }
-    html += "</div>";
+
     $("#results").html(html);
 
     // Store search results in sessionStorage
     sessionStorage.setItem('searchResults', html);
 }
+
 
 function addTracksToPlaylist(tracks) {
     var trackUris = tracks.map(track => "spotify:track:" + track.id);
