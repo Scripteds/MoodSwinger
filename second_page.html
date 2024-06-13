@@ -29,6 +29,9 @@
 $(document).ready(function() {
     // Attach event listener to logout button
     $("#logout-button").click(function() {
+        // Clear stored results and selected mood
+        sessionStorage.removeItem('searchResults');
+        sessionStorage.removeItem('selectedMood');
         // Redirect to index.html
         window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
