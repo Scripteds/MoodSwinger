@@ -152,17 +152,23 @@ function addTracksToPlaylist(tracks) {
         return;
     }
 
+    // cURL command to add tracks to playlist
+    var curlCommand = 'curl --request POST \
+    --url "https://api.spotify.com/v1/playlists/2GZt3WkybIvFADu9ooHvU0/tracks?uris=' + encodeURIComponent(trackUris.join(',')) + '" \
+    --header "Authorization: Bearer ' + accessToken + '" \
+    --header "Content-Type: application/json" \
+    --data \'{"uris": ["' + trackUris.join('","') + '"],"position": 0}\'';
+
+    // Display the cURL command in console
+    console.log("cURL Command:", curlCommand);
+
+    // Execute cURL command using jQuery AJAX (not recommended in production, just for demonstration)
     $.ajax({
-        url: "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks",
-        type: "POST",
+        url: "https://cors-anywhere.herokuapp.com/" + apiUrl, // Using a CORS proxy
+        type: "GET",
         headers: {
-            "Authorization": "Bearer " + accessToken,
-            "Content-Type": "application/json"
+            "Authorization": "Bearer " + accessToken
         },
-        data: JSON.stringify({
-            "uris": trackUris,
-            "position": 0
-        }),
         success: function(response) {
             console.log("Tracks added to playlist successfully:", response);
         },
@@ -184,3 +190,4 @@ function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
 
 </body>
 </html>
+
