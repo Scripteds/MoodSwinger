@@ -144,8 +144,9 @@ function displayResults(tracks) {
 
 function addTracksToPlaylist(tracks) {
     var trackUris = tracks.map(track => "spotify:track:" + track.id);
-    var playlistId = "7Fn5SdMYGiqLK9rtTfv0OJ";
+    var playlistId = "7Fn5SdMYGiqLK9rtTfv0OJ"; // Playlist ID
     var accessToken = sessionStorage.getItem('accessToken');
+    var apiUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
 
     if (!accessToken) {
         console.error("Access token not found.");
@@ -154,7 +155,7 @@ function addTracksToPlaylist(tracks) {
 
     // cURL command to add tracks to playlist
     var curlCommand = 'curl --request POST \
-    --url "https://api.spotify.com/v1/playlists/2GZt3WkybIvFADu9ooHvU0/tracks?uris=' + encodeURIComponent(trackUris.join(',')) + '" \
+    --url "' + apiUrl + '?uris=' + encodeURIComponent(trackUris.join(',')) + '" \
     --header "Authorization: Bearer ' + accessToken + '" \
     --header "Content-Type: application/json" \
     --data \'{"uris": ["' + trackUris.join('","') + '"],"position": 0}\'';
@@ -164,11 +165,16 @@ function addTracksToPlaylist(tracks) {
 
     // Execute cURL command using jQuery AJAX (not recommended in production, just for demonstration)
     $.ajax({
-        url: "https://cors-anywhere.herokuapp.com/" + apiUrl, // Using a CORS proxy
-        type: "GET",
+        url: apiUrl,
+        type: "POST",
         headers: {
-            "Authorization": "Bearer " + accessToken
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json"
         },
+        data: JSON.stringify({
+            "uris": trackUris,
+            "position": 0
+        }),
         success: function(response) {
             console.log("Tracks added to playlist successfully:", response);
         },
