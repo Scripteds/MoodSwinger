@@ -143,17 +143,26 @@ function displayResults(tracks) {
 }
 
 function addTracksToPlaylist(tracks) {
-    var trackUris = tracks.map(track => "spotify:track:" + track.id).join(',');
-    var playlistId = "7Fn5SdMYGiqLK9rtTfv0OJ";
+    var trackUris = tracks.map(track => "spotify:track:" + track.id);
+    var playlistId = "2GZt3WkybIvFADu9ooHvU0";
     var accessToken = sessionStorage.getItem('accessToken');
 
+    if (!accessToken) {
+        console.error("Access token not found.");
+        return;
+    }
+
     $.ajax({
-        url: "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks?uris=" + trackUris,
+        url: "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks",
         type: "POST",
         headers: {
             "Authorization": "Bearer " + accessToken,
             "Content-Type": "application/json"
         },
+        data: JSON.stringify({
+            "uris": trackUris,
+            "position": 0
+        }),
         success: function(response) {
             console.log("Tracks added to playlist successfully:", response);
         },
@@ -162,6 +171,7 @@ function addTracksToPlaylist(tracks) {
         }
     });
 }
+
 
 function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
     sessionStorage.setItem('trackId', trackId);
