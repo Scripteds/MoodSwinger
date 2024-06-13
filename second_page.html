@@ -143,21 +143,17 @@ function displayResults(tracks) {
 }
 
 function addTracksToPlaylist(tracks) {
-    var trackUris = tracks.map(track => "spotify:track:" + track.id);
+    var trackUris = tracks.map(track => "spotify:track:" + track.id).join(',');
     var playlistId = "7Fn5SdMYGiqLK9rtTfv0OJ";
     var accessToken = sessionStorage.getItem('accessToken');
 
     $.ajax({
-        url: "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks",
+        url: "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks?uris=" + trackUris,
         type: "POST",
         headers: {
             "Authorization": "Bearer " + accessToken,
             "Content-Type": "application/json"
         },
-        data: JSON.stringify({
-            "uris": trackUris,
-            "position": 0
-        }),
         success: function(response) {
             console.log("Tracks added to playlist successfully:", response);
         },
