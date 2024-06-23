@@ -106,7 +106,7 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
                     // If less than 7 tracks accumulated, search again with increased offset
                     searchRecommendedTracks(mood, accessToken, offset + response.tracks.length, accumulatedTracks);
                 } else {
-                    displayResults(accumulatedTracks.slice(0, 7)); // Display the first 7 tracks
+                    displayResults(mood, accumulatedTracks.slice(0, 7)); // Pass mood and the first 7 tracks
                     addTracksToPlaylist(); // Add the specific track to playlist
                 }
             } else {
@@ -119,7 +119,7 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
     });
 }
 
-function displayResults(tracks) {
+function displayResults(mood, tracks) {
     var html = "<h2>Recommended Tracks</h2>";
 
     // Random number generator between 1 and 3
@@ -166,6 +166,7 @@ function displayResults(tracks) {
     $('#results').html(html);
     sessionStorage.setItem('searchResults', html); // Store search results
 }
+
 
 function addTracksToPlaylist() {
     var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';  // Replace with your actual playlist ID
