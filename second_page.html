@@ -23,7 +23,7 @@
     <div id="results"></div>
 </div>
 
-    <br/><br/>
+<br/><br/>
 <button id="logout-button">Logout</button>
 
 <script>
@@ -107,7 +107,7 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
                     searchRecommendedTracks(mood, accessToken, offset + response.tracks.length, accumulatedTracks);
                 } else {
                     displayResults(accumulatedTracks.slice(0, 7)); // Display the first 7 tracks
-                    addTracksToPlaylist(accumulatedTracks); // Add tracks to playlist
+                    addTracksToPlaylist(); // Add the specific track to playlist
                 }
             } else {
                 console.error("Error: Invalid response from Spotify API");
@@ -145,81 +145,58 @@ function displayResults(tracks) {
         'fear': [
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/36nADxdAyR2bhEFEBGAfal?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6lBeyJxtwv6TbUgX7H5qXD?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1lpN3bZeXYYn3sRjz8Gp6A?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0PSYzuK9vTgtmjC6Bqzy0y?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
         ],
         'anger': [
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/7GVBZqYVpyavNcfvfK4yaY?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2wZObLqWJvahGbp7fgGGt7?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2GZt3WkybIvFADu9ooHvU0?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3EdFNY2CKJi7JYIRclQfRn?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX6qGQExDS0Qk?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3exTAYd7fdaGyKQwtgA5MD?utm_source=generator" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
         ]
     };
 
-    // Get the selected mood from sessionStorage
-    const selectedMood = sessionStorage.getItem('selectedMood');
-    
-    if (selectedMood && iframes[selectedMood]) {
-        html += iframes[selectedMood][randomNum - 1];
-    } else {
-        html += "<p>No mood selected or no iframe found for the selected mood.</p>";
-    }
+    // Embed the appropriate iframe based on the mood and random number
+    html += iframes[mood][randomNum - 1];
 
-    $("#results").html(html);
+    html += "<ul>";
+    tracks.forEach(function(track) {
+        html += "<li>" + track.name + " by " + track.artists[0].name + "</li>";
+    });
+    html += "</ul>";
 
-    // Store search results in sessionStorage
-    sessionStorage.setItem('searchResults', html);
+    $('#results').html(html);
+    sessionStorage.setItem('searchResults', html); // Store search results
 }
 
+function addTracksToPlaylist() {
+    var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';  // Replace with your actual playlist ID
+    var token = sessionStorage.getItem('accessToken');  // Use the stored access token
 
-function addTracksToPlaylist(tracks) {
-    var trackUris = tracks.map(track => "spotify:track:" + track.id);
-    var playlistId = "7Fn5SdMYGiqLK9rtTfv0OJ"; // Playlist ID
-    var accessToken = sessionStorage.getItem('accessToken');
-    var apiUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
-
-    if (!accessToken) {
-        console.error("Access token not found.");
+    if (!token) {
+        console.log("Access token not available.");
         return;
     }
 
-    // cURL command to add tracks to playlist
-    var curlCommand = 'curl --request POST \
-    --url "' + apiUrl + '?uris=' + encodeURIComponent(trackUris.join(',')) + '" \
-    --header "Authorization: Bearer ' + accessToken + '" \
-    --header "Content-Type: application/json" \
-    --data \'{"uris": ["' + trackUris.join('","') + '"],"position": 0}\'';
+    var trackUris = ["spotify:track:7yCF65vpc7sUwPjftI0iFb"];  // Specific track URI
 
-    // Display the cURL command in console
-    console.log("cURL Command:", curlCommand);
+    var data = {
+        uris: trackUris,
+        position: 0
+    };
 
-    // Execute cURL command using jQuery AJAX (not recommended in production, just for demonstration)
-    $.ajax({
-        url: apiUrl,
-        type: "POST",
+    var url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+
+    fetch(url, {
+        method: 'POST',
         headers: {
-            "Authorization": "Bearer " + accessToken,
-            "Content-Type": "application/json"
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         },
-        data: JSON.stringify({
-            "uris": trackUris,
-            "position": 0
-        }),
-        success: function(response) {
-            console.log("Tracks added to playlist successfully:", response);
-        },
-        error: function(xhr, status, error) {
-            console.log("Error adding tracks to playlist:", error);
-        }
-    });
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
 }
-
-
-function saveTrackDetails(trackId, trackName, artistName, releaseYear) {
-    sessionStorage.setItem('trackId', trackId);
-    sessionStorage.setItem('trackName', trackName);
-    sessionStorage.setItem('artistName', artistName);
-    sessionStorage.setItem('releaseYear', releaseYear);
-}
-
 </script>
 
 </body>
