@@ -184,7 +184,7 @@ function addTracksToPlaylist() {
         position: 0
     };
 
-    var url = `https://api.spotify.com/v1/playlists/${playlistId}/7yCF65vpc7sUwPjftI0iFb`;
+    var url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
     fetch(url, {
         method: 'POST',
@@ -205,8 +205,10 @@ function addTracksToPlaylist() {
     })
     .catch(error => {
         console.error('Error adding tracks to playlist:', error);
+        // Additional error handling or logging can be added here
     });
 }
+
 </script>
 
 </body>
