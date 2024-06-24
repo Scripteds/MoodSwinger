@@ -196,7 +196,7 @@ function addTracksToPlaylist() {
     })
     .then(response => response.json())
     .then(data => console.log(data))
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Error adding tracks to playlist:', error));
 }
 </script>
 
