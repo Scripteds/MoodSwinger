@@ -194,9 +194,18 @@ function addTracksToPlaylist() {
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.error('Error adding tracks to playlist:', error));
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Track added to playlist:', data);
+    })
+    .catch(error => {
+        console.error('Error adding tracks to playlist:', error);
+    });
 }
 </script>
 
