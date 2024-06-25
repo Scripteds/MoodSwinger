@@ -12,11 +12,11 @@
 <h1>Spotify API Mood Search</h1>
 
 <div class="image-container">
-    <img src="happy.png" alt="Happy" class="mood-image" >
-    <img src="sad.png" alt="Sad" class="mood-image" >
-    <img src="disgust.png" alt="Disgust" class="mood-image" >
-    <img src="fear.png" alt="Fear" class="mood-image" >
-    <img src="anger.png" alt="Anger" class="mood-image" >
+    <img src="happy.png" alt="Happy" class="mood-image" onclick="searchSongs('happy')">
+    <img src="sad.png" alt="Sad" class="mood-image" onclick="searchSongs('sad')">
+    <img src="disgust.png" alt="Disgust" class="mood-image" onclick="searchSongs('disgust')">
+    <img src="fear.png" alt="Fear" class="mood-image" onclick="searchSongs('fear')">
+    <img src="anger.png" alt="Anger" class="mood-image" onclick="searchSongs('anger')">
 </div>
 
 <div id="results-container">
@@ -28,11 +28,6 @@
 
 <script>
 // Function to search songs based on mood
-    $(document).ready(function() {
-    $('.mood-image').click(function() {
-        var mood = $(this).attr('alt');
-        searchSongs(mood);
-    });
 function searchSongs(mood) {
     // Map moods to Spotify seed genres
     var moodToGenre = {
@@ -48,8 +43,7 @@ function searchSongs(mood) {
     // Client ID and Client Secret
     var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
     var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
-    };
-    
+
 
 
 // Function to search recommended tracks based on mood and access token
@@ -131,7 +125,7 @@ function displayResults(mood, tracks) {
     $('#results').html(html);
 }
 
-function addTracksToPlaylist() {
+async function addTracksToPlaylist() {
     var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';
     var token = sessionStorage.getItem('accessToken');
 
