@@ -154,20 +154,7 @@ function displayResults(mood, tracks) {
         ]
     };
 
-    // Embed the appropriate iframe based on the mood and random number
-    html += iframes[mood][randomNum];
-
-    html += "<ul>";
-    tracks.forEach(function(track) {
-        html += "<li>" + track.name + " by " + track.artists[0].name + "</li>";
-    });
-    html += "</ul>";
-
-    $('#results').html(html);
-    sessionStorage.setItem('searchResults', html); // Store search results
-}
-
-function addTracksToPlaylist() {
+async function addTracksToPlaylist() {
     var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';  // Replace with your actual playlist ID
     var token = sessionStorage.getItem('accessToken');  // Use the stored access token
 
@@ -177,7 +164,6 @@ function addTracksToPlaylist() {
     }
 
     var trackUris = ["spotify:track:7yCF65vpc7sUwPjftI0iFb"];  // Specific track URI
-
     var data = {
         uris: trackUris,
         position: 0
@@ -185,28 +171,32 @@ function addTracksToPlaylist() {
 
     var url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            const error = await response.json();
+            throw new Error(`Error: ${error.error.message}`);
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Track added to playlist:', data);
-    })
-    .catch(error => {
+
+        const result = await response.json();
+        console.log('Track added to playlist:', result);
+    } catch (error) {
         console.error('Error adding tracks to playlist:', error);
         // Additional error handling or logging can be added here
-    });
+    }
 }
+
+// Example usage:
+addTracksToPlaylist();
+
 
 </script>
 
