@@ -3,405 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoodSwinger</title>
-    <style>
-        /* Body style */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-
-        /* Container style */
-        .container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-        }
-
-        /* Heading style */
-        h2 {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #333;
-        }
-
-        /* Paragraph style */
-        p {
-            color: #666;
-        }
-
-        /* Mood images style */
-        .moods {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 10px;
-            align-items: center;
-            justify-items: center;
-        }
-
-        .mood {
-            width: 100%;
-            height: 100%;
-            max-width: 400px;
-            max-height: 400px;
-            filter: grayscale(100%);
-            pointer-events: none;
-            opacity: 0.5;
-        }
-
-        .centered-container {
-            grid-column: span 3;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        /* Login button style */
-        .spotify-login-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #1db954;
-            color: #fff;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-
-        .spotify-login-btn:hover {
-            background-color: #1ed760;
-        }
-
-        /* Styles for second page */
-        .hidden {
-            display: none;
-        }
-
-        .visible {
-            display: block;
-        }
-
-        .second-page {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            width: 100%;
-            background-color: #f9f9f9;
-            color: #333;
-            padding: 20px;
-            text-align: center;
-        }
-
-        /* Mood image style */
-        .mood-image {
-            width: 100px;
-            height: 100px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            transition: transform 0.3s, border-color 0.3s;
-        }
-
-        .mood-image:hover {
-            transform: scale(1.1);
-            border-color: #1db954;
-        }
-
-        /* Track details container */
-        .track-details {
-            width: 100%;
-            max-width: 800px;
-            text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        /* Track title */
-        .track-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        /* Artist name and release year */
-        .artist-release {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        /* Spotify embed style */
-        iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        /* Results container style */
-        #results-container {
-            width: 100%;
-            max-width: 600px;
-            height: 500px;
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        /* Tracks container style */
-        .tracks {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        /* Individual track style */
-        .track {
-            padding: 15px;
-            margin: 0 auto;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px; /* Increased max-width for larger display */
-        }
-
-        .track p {
-            margin: 0;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .track a {
-            display: block;
-            margin-top: 10px;
-            color: #1db954;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .track a:hover {
-            text-decoration: underline;
-        }
-
-        /* Logout button style */
-        #logout-button {
-            display: block;
-            margin: 30px auto;
-            padding: 10px 20px;
-            background-color: #ff3b3b;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        #logout-button:hover {
-            background-color: #ff5e5e;
-        }
-
-        /* Back button style */
-        #back-button {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #555;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        #back-button:hover {
-            background-color: #777;
-        }
-    </style>
+    <title>Spotify API Mood Search</title>
+    <link rel="stylesheet" href="second_page.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <!-- MoodSwinger header -->
-    <h2>MoodSwinger</h2>
 
-    <!-- Login button with Spotify -->
-    <a href="https://accounts.spotify.com/authorize?client_id=a80fcf0c3aae4aabb6f6b6721183b72e&response_type=token&redirect_uri=https://scripteds.github.io/MoodSwinger/second_page.html&scope=user-read-private%20user-read-email%20playlist-modify-public&state=STATE&show_dialog=true" class="spotify-login-btn">Login with Spotify</a>
+<h1>Spotify API Mood Search</h1>
 
+<div class="image-container">
+    <img src="happy.png" alt="Happy" class="mood-image" onclick="searchSongs('happy')">
+    <img src="sad.png" alt="Sad" class="mood-image" onclick="searchSongs('sad')">
+    <img src="disgust.png" alt="Disgust" class="mood-image" onclick="searchSongs('disgust')">
+    <img src="fear.png" alt="Fear" class="mood-image" onclick="searchSongs('fear')">
+    <img src="anger.png" alt="Anger" class="mood-image" onclick="searchSongs('anger')">
+</div>
 
-    <!-- Container for mood images -->
-    <div class="container">
-        <div class="moods">
-            <!-- Mood images -->
-            <img src="happy.png" alt="Happy" class="mood" data-mood="happy">
-            <img src="sad.png" alt="Sad" class="mood" data-mood="sad">
-            <img src="disgust.png" alt="Disgust" class="mood" data-mood="disgust">
-            <div class="centered-container">
-                <img src="fear.png" alt="Fear" class="mood" data-mood="fear">
-                <img src="anger.png" alt="Anger" class="mood" data-mood="anger">
-            </div>
-        </div>
-    </div>
+<div id="results-container">
+    <div id="results"></div>
+</div>
 
-    <!-- Second page content -->
-    <div id="second-page" class="second-page hidden">
-        <!-- Heading for second page -->
-        <h1>Spotify API Mood Search</h1>
+<br/><br/>
+<button id="logout-button">Logout</button>
 
-        <!-- Mood image container -->
-        <div class="image-container">
-            <img src="happy.png" alt="Happy" class="mood-image" onclick="searchSongs('happy')">
-            <img src="sad.png" alt="Sad" class="mood-image" onclick="searchSongs('sad')">
-            <img src="disgust.png" alt="Disgust" class="mood-image" onclick="searchSongs('disgust')">
-            <img src="fear.png" alt="Fear" class="mood-image" onclick="searchSongs('fear')">
-            <img src="anger.png" alt="Anger" class="mood-image" onclick="searchSongs('anger')">
-        </div>
+<script>
+// Wait for the DOM to be fully loaded
+$(document).ready(function() {
+    // Attach click event handlers to mood images
+    $('.mood').on('click', function() {
+        var mood = $(this).data('mood'); // Get the mood from data attribute
+        searchSongs(mood); // Call the searchSongs function with the selected mood
+    });
 
-        <!-- Results container -->
-        <div id="results-container">
-            <div id="results"></div>
-        </div>
+    // Check if the URL contains an access token
+    var accessToken = getAccessTokenFromURL();
+    if (accessToken) {
+        sessionStorage.setItem('accessToken', accessToken);
+        window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html";
+    }
+});
 
-        <!-- Logout button -->
-        <button id="logout-button" onclick="logout()">Logout</button>
-    </div>
-
-    <!-- Script section -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Function to extract access token from URL
-        function getAccessTokenFromURL() {
-            var accessToken = null;
-            var hash = window.location.hash.substring(1);
-            var params = hash.split('&');
-            for (var i = 0; i < params.length; i++) {
-                var param = params[i].split('=');
-                if (param[0] === 'access_token') {
-                    accessToken = param[1];
-                    break;
-                }
-            }
-            return accessToken;
+// Function to extract access token from URL
+function getAccessTokenFromURL() {
+    var accessToken = null;
+    var hash = window.location.hash.substring(1);
+    var params = hash.split('&');
+    for (var i = 0; i < params.length; i++) {
+        var param = params[i].split('=');
+        if (param[0] === 'access_token') {
+            accessToken = param[1];
+            break;
         }
+    }
+    return accessToken;
+}
 
-// Function to fetch user profile
-function fetchUserProfile(accessToken) {
+// Function to search songs based on mood
+function searchSongs(mood) {
+    var moodToGenre = {
+        'happy': 'happy',
+        'sad': 'sad',
+        'disgust': 'alternative',
+        'fear': 'ambient',
+        'anger': 'metal'
+    };
+
+    var selectedGenre = moodToGenre[mood];
+
+    var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
+    var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
+
     $.ajax({
-        url: 'https://api.spotify.com/v1/me',
+        url: "https://accounts.spotify.com/api/token",
+        type: "POST",
         headers: {
-            'Authorization': 'Bearer ' + accessToken
+            "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
+        },
+        data: {
+            "grant_type": "client_credentials"
         },
         success: function(response) {
-            var userName = response.display_name || response.id;
-            $('#welcome').text('Welcome, ' + userName + '!');
-            $('#login-button').hide();
-            $('#second-page').removeClass('hidden').addClass('visible');
+            var accessToken = response.access_token;
+            sessionStorage.setItem('accessToken', accessToken);
+            sessionStorage.setItem('selectedMood', mood);
+            searchRecommendedTracks(selectedGenre, accessToken);
         },
         error: function(xhr, status, error) {
-            console.error('Error fetching user profile:', error);
+            console.log(error);
         }
     });
 }
 
+// Function to search recommended tracks based on mood and access token
+function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTracks = []) {
+    var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=7&offset=" + offset;
 
-        // Wait for the DOM to be fully loaded
-        $(document).ready(function() {
-            var accessToken = getAccessTokenFromURL();
+    if (!accessToken) {
+        console.log("Access token not available.");
+        return;
+    }
 
-            if (accessToken) {
-                // If access token is present, store it in localStorage
-                localStorage.setItem('accessToken', accessToken);
-                // Fetch user profile
-                fetchUserProfile(accessToken);
+    $.ajax({
+        url: apiUrl,
+        type: "GET",
+        headers: {
+            "Authorization": "Bearer " + accessToken
+        },
+        success: function(response) {
+            if (response && response.tracks) {
+                accumulatedTracks = accumulatedTracks.concat(response.tracks);
+                if (accumulatedTracks.length < 7) {
+                    searchRecommendedTracks(mood, accessToken, offset + response.tracks.length, accumulatedTracks);
+                } else {
+                    displayResults(mood, accumulatedTracks.slice(0, 7));
+                    addTracksToPlaylist();
+                }
             } else {
-                // Otherwise, clear any previous access token from localStorage
-                localStorage.removeItem('accessToken');
+                console.error("Error: Invalid response from Spotify API");
             }
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+        }
+    });
+}
 
-            // Attach click event handlers to mood images
-            $('.mood').on('click', function() {
-                var mood = $(this).data('mood');
-                searchSongs(mood);
-            });
+// Function to display recommended tracks
+function displayResults(mood, tracks) {
+    var html = "<h2>Recommended Tracks</h2>";
 
-            // Function to search songs based on mood
-            window.searchSongs = function(mood) {
-                var accessToken = localStorage.getItem('accessToken');
-                if (accessToken) {
-                    $.ajax({
-                        url: 'https://api.spotify.com/v1/search',
-                        headers: {
-                            'Authorization': 'Bearer ' + accessToken
-                        },
-                        data: {
-                            q: 'mood:' + mood,
-                            type: 'track',
-                            limit: 10
-                        },
-                        success: function(response) {
-                            displayResults(response.tracks.items);
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error searching songs:', error);
-                        }
-                    });
-                } else {
-                    console.error('Access token not found.');
-                }
-            };
+    var randomNum = Math.floor(Math.random() * 3);
 
-            // Function to display search results
-            function displayResults(tracks) {
-                var resultsContainer = $('#results');
-                resultsContainer.empty();
+    var iframes = {
+        'happy': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/13ormTxG6AcdCR60Oill7u" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2HigI3Azhej6MNwwU0atkj" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/39kYnpQSmhXxTwn5GV0R18" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ],
+        'sad': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5Guz2vByBEoLUOXywvp3ya" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1el2aFJNMaBHd4FcQ6E9sb" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ],
+        'disgust': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4AfVA8ipKGHxj5SpKecEQ9" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0AnMFrSfpjkHzDaFzWrL93" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3j76k6yVIoTC8G6KdnsfV4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ],
+        'fear': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2sQZzbWupU0H7RU2nIa7zn" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6nVJ4B1sJHPz2F6XmqiJ5f" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5VAP3o9jq7Hs9zxGToiE4d" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ],
+        'anger': [
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2wHJdAnpMB0hT0ZOGuPehx" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6rnS6v1JG1pBE7KuNw1efU" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5yQf8yd3LH1XRWJgh8friC" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+        ]
+    };
 
-                if (tracks.length > 0) {
-                    var tracksHTML = '<div class="tracks">';
-                    tracks.forEach(function(track) {
-                        var artists = track.artists.map(function(artist) {
-                            return artist.name;
-                        }).join(', ');
-                        var trackHTML = `
-                            <div class="track">
-                                <p>${track.name}</p>
-                                <p class="artist-release">${artists} (${track.album.release_date.split('-')[0]})</p>
-                                <iframe src="https://open.spotify.com/embed/track/${track.id}" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
-                                <a href="${track.external_urls.spotify}" target="_blank">Open in Spotify</a>
-                            </div>
-                        `;
-                        tracksHTML += trackHTML;
-                    });
-                    tracksHTML += '</div>';
-                    resultsContainer.append(tracksHTML);
-                } else {
-                    resultsContainer.text('No tracks found.');
-                }
-            }
+    if (iframes[mood]) {
+        html += iframes[mood][randomNum];
+    } else {
+        html += "<p>No recommendations found for this mood.</p>";
+    }
 
-            // Function to logout
-            window.logout = function() {
-                localStorage.removeItem('accessToken');
-                window.location.href = 'index.html';
-            };
-        });
-    </script>
+    document.body.innerHTML = html;
+}
+
+// Function to add tracks to a playlist
+function addTracksToPlaylist() {
+    var accessToken = sessionStorage.getItem('accessToken');
+    var selectedMood = sessionStorage.getItem('selectedMood');
+
+    if (!accessToken) {
+        console.log("Access token not available.");
+        return;
+    }
+
+    var playlistId = "7Fn5SdMYGiqLK9rtTfv0OJ"; // Replace with your playlist ID
+
+    var tracks = [
+        'spotify:track:6jeGRnrfc4EopCSHzXjgX8',
+        'spotify:track:0fioLzGM8ngbD1wTjDEyio',
+        'spotify:track:4UShEm8u3gzHsWFE8BNJ44'
+    ];
+
+    var apiUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+
+    $.ajax({
+        url: apiUrl,
+        type: "POST",
+        headers: {
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json"
+        },
+        data: JSON.stringify({
+            uris: tracks
+        }),
+        success: function(response) {
+            console.log("Tracks added to playlist successfully.");
+        },
+        error: function(xhr, status, error) {
+            console.error("Error adding tracks to playlist:", error);
+        }
+    });
+}
+</script>
+
 </body>
 </html>
