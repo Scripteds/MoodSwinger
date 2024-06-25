@@ -27,25 +27,7 @@
 <button id="logout-button">Logout</button>
 
 <script>
-$(document).ready(function() {
-    // Attach event listener to logout button
-    $("#logout-button").click(function() {
-        // Clear stored results and selected mood
-        sessionStorage.removeItem('searchResults');
-        sessionStorage.removeItem('selectedMood');
-        // Redirect to index.html
-        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-    });
-
-    // Retrieve stored search results and selected mood from sessionStorage
-    const storedResults = sessionStorage.getItem('searchResults');
-    const selectedMood = sessionStorage.getItem('selectedMood');
-
-    if (storedResults && selectedMood) {
-        $('#results').html(storedResults);
-    }
-});
-
+// Define searchSongs function first
 function searchSongs(mood) {
     // Map moods to Spotify seed genres
     var moodToGenre = {
@@ -83,6 +65,8 @@ function searchSongs(mood) {
         }
     });
 }
+
+// Define other functions (searchRecommendedTracks, displayResults, addTracksToPlaylist) after searchSongs function
 
 function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTracks = []) {
     // Use Spotify's recommendation API to get recommended tracks based on mood
@@ -154,6 +138,13 @@ function displayResults(mood, tracks) {
         ]
     };
 
+    // Append a random iframe for the selected mood
+    html += iframes[mood][randomNum];
+
+    // Display the generated HTML
+    $('#results').html(html);
+}
+
 async function addTracksToPlaylist() {
     var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';  // Replace with your actual playlist ID
     var token = sessionStorage.getItem('accessToken');  // Use the stored access token
@@ -195,9 +186,24 @@ async function addTracksToPlaylist() {
 }
 
 // Example usage:
-addTracksToPlaylist();
+$(document).ready(function() {
+    // Attach event listener to logout button
+    $("#logout-button").click(function() {
+        // Clear stored results and selected mood
+        sessionStorage.removeItem('searchResults');
+        sessionStorage.removeItem('selectedMood');
+        // Redirect to index.html
+        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+    });
 
+    // Retrieve stored search results and selected mood from sessionStorage
+    const storedResults = sessionStorage.getItem('searchResults');
+    const selectedMood = sessionStorage.getItem('selectedMood');
 
+    if (storedResults && selectedMood) {
+        $('#results').html(storedResults);
+    }
+});
 </script>
 
 </body>
