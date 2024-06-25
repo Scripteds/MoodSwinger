@@ -27,7 +27,25 @@
 <button id="logout-button">Logout</button>
 
 <script>
-// Function to search songs based on mood
+$(document).ready(function() {
+    // Attach event listener to logout button
+    $("#logout-button").click(function() {
+        // Clear stored results and selected mood
+        sessionStorage.removeItem('searchResults');
+        sessionStorage.removeItem('selectedMood');
+        // Redirect to index.html
+        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+    });
+
+    // Retrieve stored search results and selected mood from sessionStorage
+    const storedResults = sessionStorage.getItem('searchResults');
+    const selectedMood = sessionStorage.getItem('selectedMood');
+
+    if (storedResults && selectedMood) {
+        $('#results').html(storedResults);
+    }
+});
+
 function searchSongs(mood) {
     // Map moods to Spotify seed genres
     var moodToGenre = {
@@ -52,8 +70,7 @@ function searchSongs(mood) {
             "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
         },
         data: {
-            "grant_type": "client_credentials",
-            "scope": "playlist-modify-public"
+            "grant_type": "client_credentials"
         },
         success: function(response) {
             var accessToken = response.access_token;
@@ -67,7 +84,6 @@ function searchSongs(mood) {
     });
 }
 
-// Function to search recommended tracks based on mood and access token
 function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTracks = []) {
     // Use Spotify's recommendation API to get recommended tracks based on mood
     var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=7&offset=" + offset;
@@ -103,7 +119,6 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
     });
 }
 
-// Function to display recommended tracks
 function displayResults(mood, tracks) {
     var html = "<h2>Recommended Tracks</h2>";
 
@@ -139,23 +154,16 @@ function displayResults(mood, tracks) {
         ]
     };
 
-    // Append the iframes based on mood to the html
-    html += iframes[mood][randomNum];
-
-    // Display the results in the results container
-    $('#results').html(html);
-}
-
 async function addTracksToPlaylist() {
-    var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';
-    var token = sessionStorage.getItem('accessToken');
+    var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';  // Replace with your actual playlist ID
+    var token = sessionStorage.getItem('accessToken');  // Use the stored access token
 
     if (!token) {
         console.log("Access token not available.");
         return;
     }
 
-    var trackUris = ["spotify:track:7yCF65vpc7sUwPjftI0iFb"];
+    var trackUris = ["spotify:track:7yCF65vpc7sUwPjftI0iFb"];  // Specific track URI
     var data = {
         uris: trackUris,
         position: 0
@@ -182,28 +190,14 @@ async function addTracksToPlaylist() {
         console.log('Track added to playlist:', result);
     } catch (error) {
         console.error('Error adding tracks to playlist:', error);
+        // Additional error handling or logging can be added here
     }
 }
 
+// Example usage:
+addTracksToPlaylist();
 
-$(document).ready(function() {
-    // Attach event listener to logout button
-    $("#logout-button").click(function() {
-        // Clear stored results and selected mood
-        sessionStorage.removeItem('searchResults');
-        sessionStorage.removeItem('selectedMood');
-        // Redirect to index.html
-        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
-    });
 
-    // Retrieve stored search results and selected mood from sessionStorage
-    const storedResults = sessionStorage.getItem('searchResults');
-    const selectedMood = sessionStorage.getItem('selectedMood');
-
-    if (storedResults && selectedMood) {
-        $('#results').html(storedResults);
-    }
-});
 </script>
 
 </body>
