@@ -27,9 +27,39 @@
 <button id="logout-button">Logout</button>
 
 <script>
+// Wait for the DOM to be fully loaded
+$(document).ready(function() {
+    // Attach click event handlers to mood images
+    $('.mood').on('click', function() {
+        var mood = $(this).data('mood'); // Get the mood from data attribute
+        searchSongs(mood); // Call the searchSongs function with the selected mood
+    });
+
+    // Check if the URL contains an access token
+    var accessToken = getAccessTokenFromURL();
+    if (accessToken) {
+        sessionStorage.setItem('accessToken', accessToken);
+        window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html";
+    }
+});
+
+// Function to extract access token from URL
+function getAccessTokenFromURL() {
+    var accessToken = null;
+    var hash = window.location.hash.substring(1);
+    var params = hash.split('&');
+    for (var i = 0; i < params.length; i++) {
+        var param = params[i].split('=');
+        if (param[0] === 'access_token') {
+            accessToken = param[1];
+            break;
+        }
+    }
+    return accessToken;
+}
+
 // Function to search songs based on mood
 function searchSongs(mood) {
-    // Map moods to Spotify seed genres
     var moodToGenre = {
         'happy': 'happy',
         'sad': 'sad',
@@ -40,11 +70,9 @@ function searchSongs(mood) {
 
     var selectedGenre = moodToGenre[mood];
 
-    // Client ID and Client Secret
     var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
     var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
 
-    // Request access token
     $.ajax({
         url: "https://accounts.spotify.com/api/token",
         type: "POST",
@@ -56,8 +84,8 @@ function searchSongs(mood) {
         },
         success: function(response) {
             var accessToken = response.access_token;
-            sessionStorage.setItem('accessToken', accessToken); // Store access token
-            sessionStorage.setItem('selectedMood', mood); // Store selected mood
+            sessionStorage.setItem('accessToken', accessToken);
+            sessionStorage.setItem('selectedMood', mood);
             searchRecommendedTracks(selectedGenre, accessToken);
         },
         error: function(xhr, status, error) {
@@ -68,7 +96,6 @@ function searchSongs(mood) {
 
 // Function to search recommended tracks based on mood and access token
 function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTracks = []) {
-    // Use Spotify's recommendation API to get recommended tracks based on mood
     var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=7&offset=" + offset;
 
     if (!accessToken) {
@@ -86,11 +113,10 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
             if (response && response.tracks) {
                 accumulatedTracks = accumulatedTracks.concat(response.tracks);
                 if (accumulatedTracks.length < 7) {
-                    // If less than 7 tracks accumulated, search again with increased offset
                     searchRecommendedTracks(mood, accessToken, offset + response.tracks.length, accumulatedTracks);
                 } else {
-                    displayResults(mood, accumulatedTracks.slice(0, 7)); // Pass mood and the first 7 tracks
-                    addTracksToPlaylist(); // Add the specific track to playlist
+                    displayResults(mood, accumulatedTracks.slice(0, 7));
+                    addTracksToPlaylist();
                 }
             } else {
                 console.error("Error: Invalid response from Spotify API");
@@ -106,10 +132,8 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
 function displayResults(mood, tracks) {
     var html = "<h2>Recommended Tracks</h2>";
 
-    // Random number generator between 1 and 3
     var randomNum = Math.floor(Math.random() * 3);
 
-    // Mood-specific iframes
     var iframes = {
         'happy': [
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/13ormTxG6AcdCR60Oill7u" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
@@ -127,74 +151,64 @@ function displayResults(mood, tracks) {
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3j76k6yVIoTC8G6KdnsfV4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
         ],
         'fear': [
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/36nADxdAyR2bhEFEBGAfal" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6lBeyJxtwv6TbUgX7H5qXD" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0PSYzuK9vTgtmjC6Bqzy0y" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2sQZzbWupU0H7RU2nIa7zn" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6nVJ4B1sJHPz2F6XmqiJ5f" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5VAP3o9jq7Hs9zxGToiE4d" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
         ],
         'anger': [
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3EdFNY2CKJi7JYIRclQfRn" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX6qGQExDS0Qk" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3exTAYd7fdaGyKQwtgA5MD" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2wHJdAnpMB0hT0ZOGuPehx" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6rnS6v1JG1pBE7KuNw1efU" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5yQf8yd3LH1XRWJgh8friC" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
         ]
     };
 
-    // Append the iframes based on mood to the html
-    html += iframes[mood][randomNum];
-
-    // Display the results in the results container
-    $('#results').html(html);
-}
-
-async function addTracksToPlaylist() {
-    var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';  // Replace with your actual playlist ID
-    var token = sessionStorage.getItem('accessToken');
-    
-    if (!token) {
-    console.log("Access token not available.");
-    return;
+    if (iframes[mood]) {
+        html += iframes[mood][randomNum];
+    } else {
+        html += "<p>No recommendations found for this mood.</p>";
     }
 
-    var trackUris = ["spotify:track:7yCF65vpc7sUwPjftI0iFb"];  // Specific track URI
-    var data = {
-        uris: trackUris,
-        position: 0
-    };
+    document.body.innerHTML = html;
+}
 
-    var url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+// Function to add tracks to a playlist
+function addTracksToPlaylist() {
+    var accessToken = sessionStorage.getItem('accessToken');
+    var selectedMood = sessionStorage.getItem('selectedMood');
 
-try {
-    // Fetch request to add tracks to playlist
-    const response = await fetch(url, {
-        method: 'POST',
+    if (!accessToken) {
+        console.log("Access token not available.");
+        return;
+    }
+
+    var playlistId = "7Fn5SdMYGiqLK9rtTfv0OJ"; // Replace with your playlist ID
+
+    var tracks = [
+        'spotify:track:6jeGRnrfc4EopCSHzXjgX8',
+        'spotify:track:0fioLzGM8ngbD1wTjDEyio',
+        'spotify:track:4UShEm8u3gzHsWFE8BNJ44'
+    ];
+
+    var apiUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+
+    $.ajax({
+        url: apiUrl,
+        type: "POST",
         headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            "Authorization": "Bearer " + accessToken,
+            "Content-Type": "application/json"
         },
-        body: JSON.stringify(data)
+        data: JSON.stringify({
+            uris: tracks
+        }),
+        success: function(response) {
+            console.log("Tracks added to playlist successfully.");
+        },
+        error: function(xhr, status, error) {
+            console.error("Error adding tracks to playlist:", error);
+        }
     });
-
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`Error: ${error.error.message}`);
-    }
-
-    const result = await response.json();
-    console.log('Track added to playlist:', result);
-} catch (error) {
-    console.error('Error adding tracks to playlist:', error);
-    // Additional error handling or logging can be added here
 }
-
-
-$(document).ready(function() {
-    // Attach event listener to logout button
-    $("#logout-button").click(function() {
-        // Clear stored access token
-        sessionStorage.removeItem('accessToken');
-        // Redirect to the login page
-        window.location.href = "index.html";
-    });
-});
 </script>
 
 </body>
