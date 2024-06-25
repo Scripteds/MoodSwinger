@@ -188,20 +188,11 @@ async function addTracksToPlaylist() {
 $(document).ready(function() {
     // Attach event listener to logout button
     $("#logout-button").click(function() {
-        // Clear stored results and selected mood
-        sessionStorage.removeItem('searchResults');
-        sessionStorage.removeItem('selectedMood');
-        // Redirect to index.html
-        window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+        // Clear stored access token
+        sessionStorage.removeItem('accessToken');
+        // Redirect to the login page
+        window.location.href = "index.html";
     });
-
-    // Retrieve stored search results and selected mood from sessionStorage
-    const storedResults = sessionStorage.getItem('searchResults');
-    const selectedMood = sessionStorage.getItem('selectedMood');
-
-    if (storedResults && selectedMood) {
-        $('#results').html(storedResults);
-    }
 });
 </script>
 
