@@ -44,28 +44,7 @@ function searchSongs(mood) {
     var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
     var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
 
-    // Request access token
-    $.ajax({
-        url: "https://accounts.spotify.com/api/token",
-        type: "POST",
-        headers: {
-            "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
-        },
-        data: {
-            "grant_type": "client_credentials",
-            "scope": "playlist-modify-public"
-        },
-        success: function(response) {
-            var accessToken = response.access_token;
-            sessionStorage.setItem('accessToken', accessToken); // Store access token
-            sessionStorage.setItem('selectedMood', mood); // Store selected mood
-            searchRecommendedTracks(selectedGenre, accessToken);
-        },
-        error: function(xhr, status, error) {
-            console.log(error);
-        }
-    });
-}
+
 
 // Function to search recommended tracks based on mood and access token
 function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTracks = []) {
