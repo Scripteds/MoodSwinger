@@ -102,17 +102,6 @@
     </div>
 
     <script>
-        // Check if the URL contains an access token
-        window.addEventListener("load", function() {
-            var accessToken = getAccessTokenFromURL();
-            if (accessToken) {
-                // If access token is present, store it in sessionStorage
-                sessionStorage.setItem('accessToken', accessToken);
-                // Redirect to the main page or perform other actions
-                window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html";
-            }
-        });
-
         // Function to extract access token from URL
         function getAccessTokenFromURL() {
             var accessToken = null;
@@ -127,6 +116,18 @@
             }
             return accessToken;
         }
+        // Check if the URL contains an access token
+        window.addEventListener("load", function() {
+            var accessToken = getAccessTokenFromURL();
+            if (accessToken) {
+                // If access token is present, store it in sessionStorage
+                sessionStorage.setItem('accessToken', accessToken);
+                // Redirect to the main page or perform other actions
+                window.location.href = "https://scripteds.github.io/MoodSwinger/second_page.html";
+            }
+        });
+
+        
     </script>
 </body>
 </html>
