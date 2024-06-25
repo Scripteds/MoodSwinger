@@ -52,7 +52,8 @@ function searchSongs(mood) {
             "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
         },
         data: {
-            "grant_type": "client_credentials"
+            "grant_type": "client_credentials",
+            "scope": "playlist-modify-public"
         },
         success: function(response) {
             var accessToken = response.access_token;
