@@ -106,7 +106,7 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
 function displayResults(mood, tracks) {
     var html = "<h2>Recommended Tracks</h2>";
 
-    // Random number generator between 1 and 3
+    // Random number generator between 0 and 2 (inclusive)
     var randomNum = Math.floor(Math.random() * 3);
 
     // Mood-specific iframes
@@ -138,8 +138,20 @@ function displayResults(mood, tracks) {
         ]
     };
 
-    // Append a random iframe for the selected mood
-    html += iframes[mood][randomNum];
+    // Ensure mood is in lowercase for consistency
+    var lowerCaseMood = mood.toLowerCase();
+
+    // Check if the mood exists in iframes
+    if (iframes.hasOwnProperty(lowerCaseMood)) {
+        // Ensure randomNum is within valid range
+        if (randomNum >= 0 && randomNum < iframes[lowerCaseMood].length) {
+            html += iframes[lowerCaseMood][randomNum];
+        } else {
+            console.error("Invalid random number generated for iframes array.");
+        }
+    } else {
+        console.error("No iframes found for the mood:", lowerCaseMood);
+    }
 
     // Display the generated HTML
     $('#results').html(html);
