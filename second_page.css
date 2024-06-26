@@ -19,7 +19,7 @@ h1 {
   flex-direction: column; /* Change to column layout */
   align-items: flex-start; /* Align to the left */
   gap: 20px;
-  position: absolute; /* Position it absolutely */
+  position: fixed; /* Use fixed positioning */
   left: 20px; /* Adjust the left position */
   top: 100px; /* Adjust the top position */
 }
