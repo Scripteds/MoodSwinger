@@ -4,9 +4,6 @@ body {
   padding: 20px;
   background-color: #f9f9f9;
   color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 /* Heading style */
@@ -22,7 +19,6 @@ h1 {
   flex-direction: column; /* Change to column layout */
   align-items: flex-start; /* Align to the left */
   gap: 20px;
-  margin-bottom: 20px;
   position: absolute; /* Position it absolutely */
   left: 20px; /* Adjust the left position */
   top: 100px; /* Adjust the top position */
