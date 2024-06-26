@@ -77,7 +77,7 @@ iframe {
 #results-container {
   width: 100%;
   max-width: 1250px;
-  height: 600px;
+  height: 800px;
   text-align: center;
   margin: 20px auto; /* Center the container */
   padding-left: 150px; /* Ensure it doesn't overlap with the fixed image container */
