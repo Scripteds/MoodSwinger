@@ -141,19 +141,7 @@ function displayResults(mood, tracks) {
         ]
     };
 
-    html += iframes[mood][randomNum];
-    html += "<ul>";
-
-    tracks.forEach(function(track) {
-        html += "<li>" + track.name + " by " + track.artists[0].name + "</li>";
-    });
-
-    html += "</ul>";
-    $('#results').html(html);
-    sessionStorage.setItem('searchResults', html);
-}
-
-async function addTracksToPlaylist() {
+function addTracksToPlaylist() {
     var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';  // Replace with your actual playlist ID
     var token = sessionStorage.getItem('accessToken');  // Use the stored access token
 
