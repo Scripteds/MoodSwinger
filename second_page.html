@@ -101,33 +101,43 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
 function displayResults(mood, tracks) {
     var html = "<h2>Recommended Tracks</h2>";
 
-    var randomNum = Math.floor(Math.random() * 3);
+    var randomNum = Math.floor(Math.random() * 5);
 
     var iframes = {
         'happy': [
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/13ormTxG6AcdCR60Oill7u" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2HigI3Azhej6MNwwU0atkj" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/39kYnpQSmhXxTwn5GV0R18" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/39kYnpQSmhXxTwn5GV0R18" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4ugL49qSo5DyyukP5wmNEn" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5nOAHt3PHwtxydCwanf5wx" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
         ],
         'sad': [
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5Guz2vByBEoLUOXywvp3ya" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1el2aFJNMaBHd4FcQ6E9sb" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1E2AxOsqUWcKKsR53Yw9FC" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0kHGX5KAMBdzYwCdyyac5A" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>' 
         ],
         'disgust': [
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4AfVA8ipKGHxj5SpKecEQ9" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0AnMFrSfpjkHzDaFzWrL93" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3j76k6yVIoTC8G6KdnsfV4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3j76k6yVIoTC8G6KdnsfV4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
         ],
         'fear': [
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/36nADxdAyR2bhEFEBGAfal" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/6lBeyJxtwv6TbUgX7H5qXD" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0PSYzuK9vTgtmjC6Bqzy0y" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0PSYzuK9vTgtmjC6Bqzy0y" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
         ],
         'anger': [
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3EdFNY2CKJi7JYIRclQfRn" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX6qGQExDS0Qk" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
-            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3exTAYd7fdaGyKQwtgA5MD" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3exTAYd7fdaGyKQwtgA5MD" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
+            '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4e3QyBBQgi2YXCxUJxrAk4" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
         ]
     };
 
