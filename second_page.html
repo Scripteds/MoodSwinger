@@ -29,9 +29,8 @@
 <br/><br/>
 
 <script>
-// Define searchSongs function first
+// Ensure the searchSongs function is defined first
 function searchSongs(mood) {
-    // Map moods to Spotify seed genres
     var moodToGenre = {
         'happy': 'happy',
         'sad': 'sad',
@@ -42,11 +41,9 @@ function searchSongs(mood) {
 
     var selectedGenre = moodToGenre[mood];
 
-    // Client ID and Client Secret
     var clientId = "a80fcf0c3aae4aabb6f6b6721183b72e";
     var clientSecret = "d786a136f1714d3f98a1adeb0a5f6c09";
 
-    // Request access token
     $.ajax({
         url: "https://accounts.spotify.com/api/token",
         type: "POST",
@@ -58,8 +55,8 @@ function searchSongs(mood) {
         },
         success: function(response) {
             var accessToken = response.access_token;
-            sessionStorage.setItem('accessToken', accessToken); // Store access token
-            sessionStorage.setItem('selectedMood', mood); // Store selected mood
+            sessionStorage.setItem('accessToken', accessToken);
+            sessionStorage.setItem('selectedMood', mood);
             searchRecommendedTracks(selectedGenre, accessToken);
         },
         error: function(xhr, status, error) {
@@ -68,10 +65,7 @@ function searchSongs(mood) {
     });
 }
 
-// Define other functions (searchRecommendedTracks, displayResults, addTracksToPlaylist) after searchSongs function
-
 function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTracks = []) {
-    // Use Spotify's recommendation API to get recommended tracks based on mood
     var apiUrl = "https://api.spotify.com/v1/recommendations?seed_genres=" + mood + "&limit=7&offset=" + offset;
 
     if (!accessToken) {
@@ -89,11 +83,10 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
             if (response && response.tracks) {
                 accumulatedTracks = accumulatedTracks.concat(response.tracks);
                 if (accumulatedTracks.length < 7) {
-                    // If less than 7 tracks accumulated, search again with increased offset
                     searchRecommendedTracks(mood, accessToken, offset + response.tracks.length, accumulatedTracks);
                 } else {
-                    displayResults(mood, accumulatedTracks.slice(0, 7)); // Pass mood and the first 7 tracks
-                    addTracksToPlaylist(); // Add the specific track to playlist
+                    displayResults(mood, accumulatedTracks.slice(0, 7));
+                    addTracksToPlaylist();
                 }
             } else {
                 console.error("Error: Invalid response from Spotify API");
@@ -108,10 +101,8 @@ function searchRecommendedTracks(mood, accessToken, offset = 0, accumulatedTrack
 function displayResults(mood, tracks) {
     var html = "<h2>Recommended Tracks</h2>";
 
-    // Random number generator between 1 and 3
     var randomNum = Math.floor(Math.random() * 3);
 
-    // Mood-specific iframes
     var iframes = {
         'happy': [
             '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/13ormTxG6AcdCR60Oill7u" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>',
@@ -140,36 +131,16 @@ function displayResults(mood, tracks) {
         ]
     };
 
-    // Embed the appropriate iframe based on the mood and random number
     html += iframes[mood][randomNum];
-
     html += "<ul>";
+
     tracks.forEach(function(track) {
         html += "<li>" + track.name + " by " + track.artists[0].name + "</li>";
     });
+
     html += "</ul>";
-
     $('#results').html(html);
-    sessionStorage.setItem('searchResults', html); // Store search results
-}
-
-    // Ensure mood is in lowercase for consistency
-    var lowerCaseMood = mood.toLowerCase();
-
-    // Check if the mood exists in iframes
-    if (iframes.hasOwnProperty(lowerCaseMood)) {
-        // Ensure randomNum is within valid range
-        if (randomNum >= 0 && randomNum < iframes[lowerCaseMood].length) {
-            html += iframes[lowerCaseMood][randomNum];
-        } else {
-            console.error("Invalid random number generated for iframes array.");
-        }
-    } else {
-        console.error("No iframes found for the mood:", lowerCaseMood);
-    }
-
-    // Display the generated HTML
-    $('#results').html(html);
+    sessionStorage.setItem('searchResults', html);
 }
 
 async function addTracksToPlaylist() {
@@ -212,18 +183,13 @@ async function addTracksToPlaylist() {
     }
 }
 
-// Example usage:
 $(document).ready(function() {
-    // Attach event listener to logout button
     $("#logout-button").click(function() {
-        // Clear stored results and selected mood
         sessionStorage.removeItem('searchResults');
         sessionStorage.removeItem('selectedMood');
-        // Redirect to index.html
         window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
     });
 
-    // Retrieve stored search results and selected mood from sessionStorage
     const storedResults = sessionStorage.getItem('searchResults');
     const selectedMood = sessionStorage.getItem('selectedMood');
 
