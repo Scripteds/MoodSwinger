@@ -55,8 +55,8 @@ h1 {
 
 /* Mood image style */
 .mood-image {
-  width: 150px;
-  height: 150px;
+  width: 135px;
+  height: 135px;
   cursor: pointer;
   border: 2px solid transparent;
   border-radius: 8px;
