@@ -22,6 +22,12 @@
 
                 var clientId = "b3663f88aa9d4b85a24b868d09128f1f";
                 var clientSecret = "57e69944025c4722bf511eda7e591309";
+                var redirectUri = "https://scripteds.github.io/MoodSwinger/second_page.html";
+                var scopes = "user-library-read playlist-modify-public";
+
+                var authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&response_type=token`;
+
+                window.location.href = authUrl;
 
                 $.ajax({
                     url: "https://accounts.spotify.com/api/token",
