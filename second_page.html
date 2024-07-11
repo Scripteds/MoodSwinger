@@ -123,43 +123,36 @@
                 html += iframes[mood][randomNum];
                 $('#results').html(html);
                 sessionStorage.setItem('searchResults', html);
+                addTracksToPlaylist(sessionStorage.getItem('accessToken'));
             }
 
-            async function addTracksToPlaylist() {
-  const accessToken = getParameterByName('access_token');
-  if (!accessToken) {
-    console.error('Access token not available.');
-    return;
-  }
+async function addTracksToPlaylist(accessToken) {
+      const playlistId = '13ormTxG6AcdCR60Oill7u';
+      const trackUris = ['spotify:track:7yCF65vpc7sUwPjftI0iFb'];
+      const data = {
+        uris: trackUris,
+        position: 0,
+      };
 
-  sessionStorage.setItem('accessToken', accessToken);
+      const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+      const headers = {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      };
 
-  const playlistId = '13ormTxG6AcdCR60Oill7u';
-  const trackUris = ['spotify:track:7yCF65vpc7sUwPjftI0iFb'];
-  const data = {
-    uris: trackUris,
-    position: 0,
-  };
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(data),
+        });
 
-  const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
-  const headers = {
-    'Authorization': `Bearer ${accessToken}`,
-    'Content-Type': 'application/json',
-  };
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-    console.log('Track added to playlist:', result);
-  } catch (error) {
-    console.error('Error adding tracks to playlist:', error);
-  }
-}
+        const result = await response.json();
+        console.log('Track added to playlist:', result);
+      } catch (error) {
+        console.error('Error adding tracks to playlist:', error);
+      }
+    }
 
 // Helper function to get a URL parameter by name
 function getParameterByName(name) {
