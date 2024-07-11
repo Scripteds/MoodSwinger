@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="second_page.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
   function searchSongs(mood) {
     var moodToGenre = {
       'happy': 'happy',
@@ -186,10 +185,12 @@ function addTracksToPlaylist() {
     });
   }
 
-  $(document).ready(function() {
-    var selectedMood = sessionStorage.getItem('selectedMood');
-    generatePlaylist(selectedMood);
-    $('#add-to-playlist').click(addTracksToPlaylist);
+  document.addEventListener("DOMContentLoaded", function() {
+    $(document).ready(function() {
+      var selectedMood = sessionStorage.getItem('selectedMood');
+      generatePlaylist(selectedMood);
+      $('#add-to-playlist').click(addTracksToPlaylist);
+    });
   });
     </script>
 </head>
