@@ -159,6 +159,13 @@ async function addTracksToPlaylist(accessToken) {
   }
 }
 
+// Extract the access token from the URL
+const urlParams = new URLSearchParams(window.location.hash);
+const accessToken = urlParams.get('access_token');
+
+// Call addTracksToPlaylist with the access token
+addTracksToPlaylist(accessToken);
+
 
 // Helper function to get a URL parameter by name
 function getParameterByName(name) {
