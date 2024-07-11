@@ -22,12 +22,6 @@
 
                 var clientId = "b3663f88aa9d4b85a24b868d09128f1f";
                 var clientSecret = "57e69944025c4722bf511eda7e591309";
-                var redirectUri = "https://scripteds.github.io/MoodSwinger/second_page.html";
-                var scopes = "user-library-read playlist-modify-public";
-
-                var authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&response_type=token`;
-
-                window.location.href = authUrl;
 
                 $.ajax({
                     url: "https://accounts.spotify.com/api/token",
@@ -125,54 +119,51 @@
                         '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5LwY6EMl1vM7eAJ0zjS8k9" width="100%" height="500" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>'
                     ]
                 };
-                addTracksToPlaylist(sessionStorage.getItem('accessToken'));
+
                 html += iframes[mood][randomNum];
                 $('#results').html(html);
                 sessionStorage.setItem('searchResults', html);
             }
 
-async function addTracksToPlaylist(accessToken) {
-  const playlistId = '13ormTxG6AcdCR60Oill7u';
-  const trackUris = ['spotify:track:7yCF65vpc7sUwPjftI0iFb'];
-  const data = {
-    uris: trackUris,
-    position: 0,
-  };
+            async function addTracksToPlaylist() {
+                var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';  // Replace with your actual playlist ID
+                var token = sessionStorage.getItem('accessToken');  // Use the stored access token
 
-  const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
-  const headers = {
-    'Authorization': `Bearer ${accessToken}`,
-    'Content-Type': 'application/json',
-  };
+                if (!token) {
+                    console.log("Access token not available.");
+                    return;
+                }
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    });
+                var trackUris = ["spotify:track:7yCF65vpc7sUwPjftI0iFb"];  // Specific track URI
+                var data = {
+                    uris: trackUris,
+                    position: 0
+                };
 
-    const result = await response.json();
-    console.log('Track added to playlist:', result);
-  } catch (error) {
-    console.error('Error adding tracks to playlist:', error);
-  }
-}
+                var url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
-// Extract the access token from the URL
-const urlParams = new URLSearchParams(window.location.hash);
-const accessToken = urlParams.get('access_token');
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
 
-// Call addTracksToPlaylist with the access token
-addTracksToPlaylist(accessToken);
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(`Error: ${error.error.message}`);
+                    }
 
-
-// Helper function to get a URL parameter by name
-function getParameterByName(name) {
-  const url = window.location.href;
-  const param = url.match(new RegExp('[?&]' + name + '=([^&]*)'));
-  return param && param[1];
-}
+                    const result = await response.json();
+                    console.log('Track added to playlist:', result);
+                } catch (error) {
+                    console.error('Error adding tracks to playlist:', error);
+                    // Additional error handling or logging can be added here
+                }
+            }
 
             $("#logout-button").click(function() {
                 sessionStorage.removeItem('searchResults');
