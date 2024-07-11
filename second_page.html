@@ -126,44 +126,47 @@
             }
 
             async function addTracksToPlaylist() {
-                var playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';  // Replace with your actual playlist ID
-                var token = sessionStorage.getItem('accessToken');  // Use the stored access token
+  const accessToken = getParameterByName('access_token');
+  if (!accessToken) {
+    console.error('Access token not available.');
+    return;
+  }
 
-                if (!token) {
-                    console.log("Access token not available.");
-                    return;
-                }
+  sessionStorage.setItem('accessToken', accessToken);
 
-                var trackUris = ["spotify:track:7yCF65vpc7sUwPjftI0iFb"];  // Specific track URI
-                var data = {
-                    uris: trackUris,
-                    position: 0
-                };
+  const playlistId = '7Fn5SdMYGiqLK9rtTfv0OJ';
+  const trackUris = ['spotify:track:7yCF65vpc7sUwPjftI0iFb'];
+  const data = {
+    uris: trackUris,
+    position: 0,
+  };
 
-                var url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+  const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+  const headers = {
+    'Authorization': `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+  };
 
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    });
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data),
+    });
 
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(`Error: ${error.error.message}`);
-                    }
+    const result = await response.json();
+    console.log('Track added to playlist:', result);
+  } catch (error) {
+    console.error('Error adding tracks to playlist:', error);
+  }
+}
 
-                    const result = await response.json();
-                    console.log('Track added to playlist:', result);
-                } catch (error) {
-                    console.error('Error adding tracks to playlist:', error);
-                    // Additional error handling or logging can be added here
-                }
-            }
+// Helper function to get a URL parameter by name
+function getParameterByName(name) {
+  const url = window.location.href;
+  const param = url.match(new RegExp('[?&]' + name + '=([^&]*)'));
+  return param && param[1];
+}
 
             $("#logout-button").click(function() {
                 sessionStorage.removeItem('searchResults');
