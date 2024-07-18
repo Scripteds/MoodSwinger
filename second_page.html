@@ -121,6 +121,13 @@
                 };
 
                 html += iframes[mood][randomNum];
+
+                html += "<ul>";
+                tracks.forEach(function(track) {
+                html += "<li>" + track.name + " by " + track.artists[0].name + "</li>";
+                });
+                html += "</ul>";
+
                 $('#results').html(html);
                 sessionStorage.setItem('searchResults', html);
             }
